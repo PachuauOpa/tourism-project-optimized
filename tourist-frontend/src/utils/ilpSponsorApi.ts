@@ -104,3 +104,58 @@ export const promoteToRegularIlp = async (
 
   return handleResponse<{ message: string; log: SponsorLogRecord }>(response);
 };
+
+// ---------------------------------------------------------------------------
+// Payment API
+// ---------------------------------------------------------------------------
+
+export interface PaymentOrderResponse {
+  orderId: string;
+  amount: number;
+  currency: string;
+  keyId: string;
+}
+
+export interface PaymentStatusResponse {
+  paymentStatus: 'not_initiated' | 'created' | 'paid' | 'failed';
+  paidAt?: string;
+  keyId: string;
+}
+
+export const createPaymentOrder = async (payload: {
+  referenceNumber: string;
+  applicationType: string;
+}): Promise<PaymentOrderResponse> => {
+  const response = await fetch(`${API_BASE_URL}/api/payments/create-order`, {
+    method: 'POST',
+    headers: buildHeaders(),
+    body: JSON.stringify(payload)
+  });
+
+  return handleResponse<PaymentOrderResponse>(response);
+};
+
+export const verifyPayment = async (payload: {
+  razorpayOrderId: string;
+  razorpayPaymentId: string;
+  razorpaySignature: string;
+  referenceNumber: string;
+  applicationType: string;
+}): Promise<{ success: boolean; message: string }> => {
+  const response = await fetch(`${API_BASE_URL}/api/payments/verify-payment`, {
+    method: 'POST',
+    headers: buildHeaders(),
+    body: JSON.stringify(payload)
+  });
+
+  return handleResponse<{ success: boolean; message: string }>(response);
+};
+
+export const fetchPaymentStatus = async (referenceNumber: string): Promise<PaymentStatusResponse> => {
+  const response = await fetch(`${API_BASE_URL}/api/payments/status/${referenceNumber}`, {
+    method: 'GET',
+    headers: buildHeaders()
+  });
+
+  return handleResponse<PaymentStatusResponse>(response);
+};

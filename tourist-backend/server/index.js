@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import crypto from 'crypto';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import Razorpay from 'razorpay';
 import { createClient } from '@supabase/supabase-js';
 import { initializeDatabase, pool } from './db.js';
 import { registerDestinationRoutes } from './destinationRoutes.js';
@@ -27,6 +28,10 @@ const app = express();
 const port = Number(process.env.PORT || 4000);
 
 app.use(cors());
+
+// Raw body parser MUST be registered before the JSON parser so the Razorpay
+// webhook handler can verify the HMAC signature against the raw payload bytes.
+app.use('/api/payments/razorpay/webhook', express.raw({ type: 'application/json' }));
 app.use(express.json({ limit: '20mb' }));
 
 const APP_TYPE_TO_TABLE = {
@@ -52,6 +57,18 @@ const ADMIN_PASSWORD = process.env.ILP_ADMIN_PASSWORD || 'admin123';
 const STORAGE_BUCKET = process.env.SUPABASE_BUCKET || process.env.VITE_SUPABASE_BUCKET || 'mizTour';
 const SIGNED_URL_TTL_SECONDS = Number(process.env.SUPABASE_SIGNED_URL_TTL_SECONDS || 3600);
 const PUBLIC_API_BASE_URL = process.env.PUBLIC_API_BASE_URL || '';
+const RAZORPAY_KEY_ID = process.env.RAZORPAY_KEY_ID || '';
+const RAZORPAY_KEY_SECRET = process.env.RAZORPAY_KEY_SECRET || '';
+const RAZORPAY_WEBHOOK_SECRET = process.env.RAZORPAY_WEBHOOK_SECRET || '';
+const ILP_PAYMENT_AMOUNT_PAISE = Number(process.env.ILP_PAYMENT_AMOUNT_PAISE || 5000);
+
+const RAZORPAY_CONFIGURED =
+  Boolean(RAZORPAY_KEY_ID) &&
+  Boolean(RAZORPAY_KEY_SECRET) &&
+  !RAZORPAY_KEY_SECRET.startsWith('YOUR_') &&
+  RAZORPAY_KEY_SECRET !== 'YOUR_RAZORPAY_KEY_SECRET';
+
+const getRazorpayClient = () => new Razorpay({ key_id: RAZORPAY_KEY_ID, key_secret: RAZORPAY_KEY_SECRET });
 
 const sanitizeFileName = (name = 'document') => name.replace(/[^a-zA-Z0-9._-]/g, '_');
 
@@ -514,6 +531,286 @@ const requireSponsor = (req, res, next) => {
 
 app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok' });
+});
+
+// ---------------------------------------------------------------------------
+// Razorpay Payment Endpoints
+// ---------------------------------------------------------------------------
+
+// POST /api/payments/create-order
+// Creates a Razorpay order for ₹50 (5000 paise) tied to a reference number.
+app.post('/api/payments/create-order', async (req, res) => {
+  try {
+    // Guard: reject early if Razorpay credentials are not configured.
+    if (!RAZORPAY_CONFIGURED) {
+      console.error(
+        '[Razorpay] RAZORPAY_KEY_SECRET is not configured. ' +
+        'Set a real secret in tourist-backend/.env and restart the server.'
+      );
+      res.status(503).json({
+        message:
+          'Payment gateway is not configured on the server. ' +
+          'Please set RAZORPAY_KEY_SECRET in the backend .env file and restart.'
+      });
+      return;
+    }
+
+    const { referenceNumber, applicationType } = req.body || {};
+    const normalizedRef = String(referenceNumber || '').trim();
+    const normalizedType = String(applicationType || '').trim();
+
+    if (!/^\d{12}$/.test(normalizedRef)) {
+      res.status(400).json({ message: 'Reference number must be 12 digits' });
+      return;
+    }
+
+    if (!APP_TYPE_TO_TABLE[normalizedType] && normalizedType !== 'temporary_ilp' && normalizedType !== 'temporary_stay_permit') {
+      res.status(400).json({ message: 'Payment is only required for temporary ILP and stay permit applications' });
+      return;
+    }
+
+    // Look up the application and its current payment status.
+    const table = normalizedType === 'ilp_exemption' ? null : APP_TYPE_TO_TABLE[normalizedType];
+    if (!table) {
+      res.status(400).json({ message: 'Payment is not applicable for this application type' });
+      return;
+    }
+
+    const appResult = await pool.query(
+      `SELECT id, application_status, payment_status FROM ${table} WHERE reference_number = $1 LIMIT 1`,
+      [normalizedRef]
+    );
+
+    if (appResult.rowCount === 0) {
+      res.status(404).json({ message: 'Application not found' });
+      return;
+    }
+
+    const application = appResult.rows[0];
+
+    if (application.application_status !== 'accepted') {
+      res.status(400).json({ message: 'Payment can only be made after application is accepted' });
+      return;
+    }
+
+    if (application.payment_status === 'paid') {
+      res.status(409).json({ message: 'Payment has already been completed for this application' });
+      return;
+    }
+
+    // Check for an existing open Razorpay order to avoid duplicate creation.
+    const existingOrder = await pool.query(
+      `SELECT razorpay_order_id, amount_paise, currency FROM ilp_payments WHERE reference_number = $1 AND status = 'created' ORDER BY created_at DESC LIMIT 1`,
+      [normalizedRef]
+    );
+
+    if (existingOrder.rowCount > 0) {
+      const existing = existingOrder.rows[0];
+      res.json({
+        orderId: existing.razorpay_order_id,
+        amount: existing.amount_paise,
+        currency: existing.currency,
+        keyId: RAZORPAY_KEY_ID
+      });
+      return;
+    }
+
+    const razorpay = getRazorpayClient();
+    let order;
+    try {
+      order = await razorpay.orders.create({
+        amount: ILP_PAYMENT_AMOUNT_PAISE,
+        currency: 'INR',
+        receipt: `ilp_${normalizedRef}`,
+        notes: { referenceNumber: normalizedRef, applicationType: normalizedType }
+      });
+    } catch (razorpayError) {
+      // Surface the exact Razorpay API error for easier debugging.
+      const rzpMessage =
+        razorpayError?.error?.description ||
+        razorpayError?.message ||
+        String(razorpayError);
+      console.error('[Razorpay] orders.create failed:', rzpMessage, razorpayError);
+      res.status(502).json({ message: `Razorpay error: ${rzpMessage}` });
+      return;
+    }
+
+    await pool.query(
+      `INSERT INTO ilp_payments (reference_number, application_type, razorpay_order_id, amount_paise, currency, status)
+       VALUES ($1, $2, $3, $4, $5, 'created')`,
+      [normalizedRef, normalizedType, order.id, ILP_PAYMENT_AMOUNT_PAISE, 'INR']
+    );
+
+    // Mark application as payment_pending so the admin can see it.
+    await pool.query(
+      `UPDATE ${table} SET payment_status = 'payment_pending' WHERE reference_number = $1`,
+      [normalizedRef]
+    );
+
+    res.json({ orderId: order.id, amount: order.amount, currency: order.currency, keyId: RAZORPAY_KEY_ID });
+  } catch (error) {
+    console.error('Failed to create Razorpay order (unexpected):', error);
+    res.status(500).json({ message: 'Failed to create payment order' });
+  }
+});
+
+// POST /api/payments/verify-payment
+// Called by the frontend after Razorpay checkout succeeds; verifies signature
+// server-side and marks the application as paid.
+app.post('/api/payments/verify-payment', async (req, res) => {
+  try {
+    const { razorpayOrderId, razorpayPaymentId, razorpaySignature, referenceNumber, applicationType } = req.body || {};
+
+    if (!razorpayOrderId || !razorpayPaymentId || !razorpaySignature) {
+      res.status(400).json({ message: 'Missing Razorpay payment fields' });
+      return;
+    }
+
+    // Validate signature: HMAC-SHA256(orderId + '|' + paymentId, secret)
+    const expectedSignature = crypto
+      .createHmac('sha256', RAZORPAY_KEY_SECRET)
+      .update(`${razorpayOrderId}|${razorpayPaymentId}`)
+      .digest('hex');
+
+    if (expectedSignature !== razorpaySignature) {
+      res.status(400).json({ message: 'Payment signature verification failed' });
+      return;
+    }
+
+    const normalizedRef = String(referenceNumber || '').trim();
+    const normalizedType = String(applicationType || '').trim();
+
+    const client = await pool.connect();
+    try {
+      await client.query('BEGIN');
+
+      // Update ilp_payments record.
+      await client.query(
+        `UPDATE ilp_payments
+         SET razorpay_payment_id = $1, razorpay_signature = $2, status = 'paid', paid_at = NOW()
+         WHERE razorpay_order_id = $3`,
+        [razorpayPaymentId, razorpaySignature, razorpayOrderId]
+      );
+
+      // Mark the application itself as paid.
+      const table = APP_TYPE_TO_TABLE[normalizedType];
+      if (table) {
+        await client.query(
+          `UPDATE ${table} SET payment_status = 'paid' WHERE reference_number = $1`,
+          [normalizedRef]
+        );
+      }
+
+      await client.query('COMMIT');
+      res.json({ success: true, message: 'Payment verified and recorded successfully' });
+    } catch (dbError) {
+      await client.query('ROLLBACK');
+      throw dbError;
+    } finally {
+      client.release();
+    }
+  } catch (error) {
+    console.error('Failed to verify Razorpay payment:', error);
+    res.status(500).json({ message: 'Failed to verify payment' });
+  }
+});
+
+// POST /api/payments/razorpay/webhook
+// Razorpay server-to-server webhook for reliable status updates.
+// Raw body is required for HMAC verification — registered before JSON middleware.
+app.post('/api/payments/razorpay/webhook', (req, res) => {
+  try {
+    const signature = req.headers['x-razorpay-signature'] || '';
+    const rawBody = req.body; // Buffer (raw middleware registered above)
+
+    if (!RAZORPAY_WEBHOOK_SECRET) {
+      // Webhook secret not configured; skip verification and acknowledge.
+      res.json({ received: true });
+      return;
+    }
+
+    const expectedSignature = crypto
+      .createHmac('sha256', RAZORPAY_WEBHOOK_SECRET)
+      .update(rawBody)
+      .digest('hex');
+
+    if (expectedSignature !== signature) {
+      res.status(400).json({ message: 'Invalid webhook signature' });
+      return;
+    }
+
+    const event = JSON.parse(rawBody.toString('utf-8'));
+    const eventName = event?.event || '';
+
+    if (eventName === 'payment.captured' || eventName === 'order.paid') {
+      const orderId = event?.payload?.payment?.entity?.order_id
+        || event?.payload?.order?.entity?.id
+        || '';
+      const paymentId = event?.payload?.payment?.entity?.id || '';
+
+      if (orderId) {
+        pool.query(
+          `UPDATE ilp_payments SET razorpay_payment_id = COALESCE(razorpay_payment_id, $1), status = 'paid', paid_at = COALESCE(paid_at, NOW()) WHERE razorpay_order_id = $2 AND status != 'paid'`,
+          [paymentId, orderId]
+        ).then(async (result) => {
+          if ((result.rowCount || 0) > 0) {
+            // Also mark the application payment_status = 'paid' via ilp_payments lookup.
+            const paymentRow = await pool.query(
+              'SELECT reference_number, application_type FROM ilp_payments WHERE razorpay_order_id = $1 LIMIT 1',
+              [orderId]
+            );
+            const row = paymentRow.rows[0];
+            if (row) {
+              const table = APP_TYPE_TO_TABLE[row.application_type];
+              if (table) {
+                await pool.query(
+                  `UPDATE ${table} SET payment_status = 'paid' WHERE reference_number = $1`,
+                  [row.reference_number]
+                );
+              }
+            }
+          }
+        }).catch((err) => console.error('Webhook DB update failed:', err));
+      }
+    }
+
+    res.json({ received: true });
+  } catch (error) {
+    console.error('Razorpay webhook error:', error);
+    res.status(500).json({ message: 'Webhook processing failed' });
+  }
+});
+
+// GET /api/payments/status/:referenceNumber
+// Returns the payment status for a given reference number.
+app.get('/api/payments/status/:referenceNumber', async (req, res) => {
+  try {
+    const referenceNumber = String(req.params.referenceNumber || '').trim();
+
+    if (!/^\d{12}$/.test(referenceNumber)) {
+      res.status(400).json({ message: 'Reference number must be 12 digits' });
+      return;
+    }
+
+    const result = await pool.query(
+      `SELECT status, paid_at, razorpay_order_id, razorpay_payment_id
+       FROM ilp_payments
+       WHERE reference_number = $1
+       ORDER BY created_at DESC LIMIT 1`,
+      [referenceNumber]
+    );
+
+    if (result.rowCount === 0) {
+      res.json({ paymentStatus: 'not_initiated', keyId: RAZORPAY_KEY_ID });
+      return;
+    }
+
+    const row = result.rows[0];
+    res.json({ paymentStatus: row.status, paidAt: row.paid_at, keyId: RAZORPAY_KEY_ID });
+  } catch (error) {
+    console.error('Failed to get payment status:', error);
+    res.status(500).json({ message: 'Failed to get payment status' });
+  }
 });
 
 app.post('/api/storage/upload', async (req, res) => {
@@ -1420,6 +1717,14 @@ initializeDatabase()
   .then(() => {
     app.listen(port, () => {
       console.log(`ILP backend listening on port ${port}`);
+      if (RAZORPAY_CONFIGURED) {
+        console.log(`[Razorpay] ✅ Payment gateway configured (key: ${RAZORPAY_KEY_ID})`);
+      } else {
+        console.warn(
+          '[Razorpay] ⚠️  RAZORPAY_KEY_SECRET is not set or is still a placeholder. ' +
+          'Payment endpoints will return 503 until this is fixed in .env'
+        );
+      }
     });
   })
   .catch((error) => {

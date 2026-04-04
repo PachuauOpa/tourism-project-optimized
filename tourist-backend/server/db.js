@@ -72,11 +72,13 @@ export const initializeDatabase = async () => {
       upload_document_public_url TEXT,
       remarks TEXT,
       status_updated_at TIMESTAMPTZ,
+      payment_status TEXT,
       submitted_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
     )
   `);
 
   await pool.query("ALTER TABLE temporary_ilp_applications ADD COLUMN IF NOT EXISTS reference_number CHAR(12)");
+  await pool.query("ALTER TABLE temporary_ilp_applications ADD COLUMN IF NOT EXISTS payment_status TEXT");
   await pool.query("ALTER TABLE temporary_ilp_applications ADD COLUMN IF NOT EXISTS application_status TEXT NOT NULL DEFAULT 'pending'");
   await pool.query("ALTER TABLE temporary_ilp_applications ADD COLUMN IF NOT EXISTS status_updated_at TIMESTAMPTZ");
   await pool.query("ALTER TABLE temporary_ilp_applications ADD COLUMN IF NOT EXISTS upload_document_storage_path TEXT");
@@ -119,11 +121,13 @@ export const initializeDatabase = async () => {
       upload_document_public_url TEXT,
       remarks TEXT,
       status_updated_at TIMESTAMPTZ,
+      payment_status TEXT,
       submitted_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
     )
   `);
 
   await pool.query("ALTER TABLE temporary_stay_permit_applications ADD COLUMN IF NOT EXISTS reference_number CHAR(12)");
+  await pool.query("ALTER TABLE temporary_stay_permit_applications ADD COLUMN IF NOT EXISTS payment_status TEXT");
   await pool.query("ALTER TABLE temporary_stay_permit_applications ADD COLUMN IF NOT EXISTS application_status TEXT NOT NULL DEFAULT 'pending'");
   await pool.query("ALTER TABLE temporary_stay_permit_applications ADD COLUMN IF NOT EXISTS status_updated_at TIMESTAMPTZ");
   await pool.query("ALTER TABLE temporary_stay_permit_applications ADD COLUMN IF NOT EXISTS upload_document_storage_path TEXT");
@@ -215,6 +219,25 @@ export const initializeDatabase = async () => {
   await pool.query("ALTER TABLE regular_ilp_promotions ADD COLUMN IF NOT EXISTS submitted_at TIMESTAMPTZ NOT NULL DEFAULT NOW()");
   await pool.query("CREATE UNIQUE INDEX IF NOT EXISTS regular_ilp_promotions_pass_no_key ON regular_ilp_promotions(pass_no)");
   await pool.query("CREATE INDEX IF NOT EXISTS regular_ilp_promotions_sponsor_id_idx ON regular_ilp_promotions(sponsor_id)");
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS ilp_payments (
+      id BIGSERIAL PRIMARY KEY,
+      reference_number CHAR(12) NOT NULL,
+      application_type TEXT NOT NULL,
+      razorpay_order_id TEXT NOT NULL UNIQUE,
+      razorpay_payment_id TEXT,
+      razorpay_signature TEXT,
+      amount_paise INTEGER NOT NULL DEFAULT 5000,
+      currency TEXT NOT NULL DEFAULT 'INR',
+      status TEXT NOT NULL DEFAULT 'created',
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      paid_at TIMESTAMPTZ
+    )
+  `);
+
+  await pool.query("CREATE INDEX IF NOT EXISTS ilp_payments_reference_number_idx ON ilp_payments(reference_number)");
+  await pool.query("CREATE INDEX IF NOT EXISTS ilp_payments_order_id_idx ON ilp_payments(razorpay_order_id)");
 
   await pool.query(`
     UPDATE temporary_ilp_applications

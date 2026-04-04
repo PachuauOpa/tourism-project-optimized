@@ -1643,6 +1643,204 @@ select {
   flex: 1;
 }
 
+.ilp-permit-actions .primary-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  filter: grayscale(0.4);
+}
+
+.ilp-payment-download-hint {
+  margin: 10px 0 0;
+  font-size: 13px;
+  color: #7a5e00;
+  font-weight: 600;
+  text-align: center;
+  background: #fff8dc;
+  border: 1px solid #f0d96b;
+  border-radius: 10px;
+  padding: 8px 12px;
+}
+
+/* ===== Payment Gate ===== */
+
+.ilp-payment-step {
+  padding: 0 !important;
+  overflow: hidden;
+}
+
+.ilp-payment-gate {
+  background: linear-gradient(145deg, #f0f7ff 0%, #eaf3ff 100%);
+  border: 1.5px solid #b8d7ff;
+  border-radius: 18px;
+  padding: 28px 22px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 14px;
+}
+
+.ilp-payment-gate-icon {
+  font-size: 42px;
+  line-height: 1;
+}
+
+.ilp-payment-gate-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 800;
+  color: #1a3a6a;
+  font-family: 'Karla', sans-serif;
+}
+
+.ilp-payment-gate-subtitle {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.55;
+  color: #3d5a85;
+  font-weight: 600;
+  max-width: 340px;
+}
+
+.ilp-payment-amount-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #ffffff;
+  border: 2px solid #4f46e5;
+  border-radius: 14px;
+  padding: 12px 24px;
+  gap: 2px;
+}
+
+.ilp-payment-amount-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #6357c7;
+}
+
+.ilp-payment-amount-value {
+  font-size: 32px;
+  font-weight: 900;
+  color: #4f46e5;
+  font-family: 'Karla', sans-serif;
+  line-height: 1.1;
+}
+
+.ilp-payment-gate-note {
+  margin: 0;
+  font-size: 13px;
+  color: #7a6200;
+  font-weight: 600;
+  background: #fff8d4;
+  border: 1px solid #f0d070;
+  border-radius: 10px;
+  padding: 8px 14px;
+  width: 100%;
+}
+
+.ilp-payment-error {
+  margin: 0;
+  font-size: 13px;
+  color: #a02020;
+  font-weight: 700;
+  background: #ffe9eb;
+  border: 1px solid #f5c0c0;
+  border-radius: 10px;
+  padding: 9px 14px;
+  width: 100%;
+}
+
+.ilp-payment-btn {
+  width: 100%;
+  min-height: 52px;
+  border: none;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #4f46e5 0%, #6d67f0 100%);
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 0.2px;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.15s;
+  box-shadow: 0 6px 22px rgba(79, 70, 229, 0.38);
+  font-family: 'Karla', sans-serif;
+}
+
+.ilp-payment-btn:hover:not(:disabled) {
+  opacity: 0.93;
+  transform: translateY(-1px);
+}
+
+.ilp-payment-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.ilp-payment-btn-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.ilp-payment-spinner {
+  width: 18px;
+  height: 18px;
+  border: 2.5px solid rgba(255, 255, 255, 0.4);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: ilp-spin 0.75s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes ilp-spin {
+  to { transform: rotate(360deg); }
+}
+
+.ilp-payment-secure-note {
+  margin: 0;
+  font-size: 12px;
+  color: #5f738f;
+  font-weight: 600;
+}
+
+/* ===== Payment Success Banner ===== */
+
+.ilp-payment-success-banner {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: linear-gradient(135deg, #d4f7e8 0%, #e8fdf3 100%);
+  border: 1.5px solid #6fcfa2;
+  border-radius: 16px;
+  padding: 16px 18px;
+}
+
+.ilp-payment-success-icon {
+  font-size: 28px;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.ilp-payment-success-banner strong {
+  display: block;
+  font-size: 15px;
+  font-weight: 800;
+  color: #0f5e38;
+  font-family: 'Karla', sans-serif;
+}
+
+.ilp-payment-success-banner p {
+  margin: 2px 0 0;
+  font-size: 13px;
+  color: #266649;
+  font-weight: 600;
+}
+
 .ilp-admin-login-page {
   min-height: 100vh;
   display: grid;
@@ -5720,6 +5918,7 @@ select {
   letter-spacing: -0.2px;
   display: -webkit-box;
   -webkit-line-clamp: 1;
+  line-clamp: 1;
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -5746,6 +5945,7 @@ select {
   font-size: 14px;
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -7260,3 +7460,1191 @@ select {
     width: min(100%, 520px);
   }
 }
+
+/* =======================================================================
+   RESPONSIVE DESIGN SYSTEM
+   Bootstrap 5 + Tailwind CSS integration
+   Breakpoints:
+   - Mobile: < 576px
+   - Tablet: 576px – 991px
+   - Desktop: ≥ 992px (lg)
+   - Wide: ≥ 1200px (xl)
+   - Ultra: ≥ 1400px (2xl / xxl)
+   ======================================================================= */
+
+/* -----------------------------------------------------------------------
+   Bootstrap Reset — override Bootstrap defaults that clash with app design
+   ----------------------------------------------------------------------- */
+
+/* Bootstrap sets box-sizing on *, which is fine — we keep it */
+/* Override Bootstrap's body background/color with our design tokens */
+body {
+  background-color: var(--bg) !important;
+  color: var(--ink) !important;
+  font-family: 'Karla', sans-serif !important;
+}
+
+/* Bootstrap sets h1-h6 margin-top: 0 which is actually what we want */
+/* Keep Bootstrap's .container responsive but we'll use our layout classes primarily */
+
+/* -----------------------------------------------------------------------
+   APP LAYOUT SYSTEM — sidebar + content shell
+   ----------------------------------------------------------------------- */
+
+.app-layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  position: relative;
+}
+
+/* -----------------------------------------------------------------------
+   DESKTOP NAV WRAPPER + MOBILE NAV WRAPPER (show/hide logic)
+   ----------------------------------------------------------------------- */
+
+/* Desktop sidebar hidden on mobile */
+.desktop-nav-wrapper {
+  display: none;
+}
+
+/* Mobile bottom nav visible on mobile */
+.mobile-nav-wrapper {
+  display: block;
+}
+
+@media (min-width: 992px) {
+  /* Show desktop sidebar */
+  .desktop-nav-wrapper {
+    display: block;
+  }
+  /* Hide the mobile bottom wrapper */
+  .mobile-nav-wrapper {
+    display: none;
+  }
+
+  /* App layout becomes flex-row on desktop */
+  .app-layout {
+    flex-direction: row;
+  }
+
+  /* Main content shifts right of sidebar */
+  .app-layout > main.screen {
+    margin-left: var(--sidebar-width, 260px);
+    transition: margin-left 0.3s ease;
+  }
+
+  .app-layout--no-nav > main.screen {
+    margin-left: 0;
+  }
+}
+
+/* -----------------------------------------------------------------------
+   DESKTOP SIDEBAR STYLES
+   ----------------------------------------------------------------------- */
+
+.desktop-sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 260px;
+  background: #ffffff;
+  border-right: 1px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  z-index: 900;
+  box-shadow: 4px 0 24px rgba(35, 61, 107, 0.07);
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+}
+
+.desktop-sidebar--collapsed {
+  width: 72px;
+}
+
+/* Set CSS variable so main content knows how far to shift */
+.desktop-sidebar:not(.desktop-sidebar--collapsed) ~ .app-layout > main.screen,
+:root {
+  --sidebar-width: 260px;
+}
+
+/* Sidebar brand area */
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 20px 16px 16px;
+  cursor: pointer;
+  border-bottom: 1px solid var(--line);
+  min-height: 82px;
+  text-decoration: none;
+  transition: background 0.15s ease;
+}
+
+.sidebar-brand:hover {
+  background: rgba(48, 149, 236, 0.04);
+}
+
+.sidebar-brand-mark {
+  width: 32px;
+  height: 72px;
+  flex-shrink: 0;
+}
+
+.sidebar-brand-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 0.95;
+  overflow: hidden;
+}
+
+.sidebar-brand-text span {
+  font-family: 'Karla', sans-serif;
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -1.5px;
+  color: var(--ink);
+  white-space: nowrap;
+}
+
+/* Sidebar navigation */
+.sidebar-nav {
+  flex: 1;
+  padding: 16px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.sidebar-nav-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  color: var(--muted);
+  text-decoration: none;
+  font-family: 'Karla', sans-serif;
+  font-weight: 600;
+  font-size: 15px;
+  transition: background 0.15s ease, color 0.15s ease, transform 0.1s ease;
+  white-space: nowrap;
+  overflow: hidden;
+  position: relative;
+}
+
+.sidebar-nav-link:hover {
+  background: rgba(48, 149, 236, 0.07);
+  color: var(--blue-500);
+  transform: translateX(2px);
+  text-decoration: none;
+}
+
+.sidebar-nav-link--active {
+  background: var(--blue-soft);
+  color: var(--blue-500);
+}
+
+.sidebar-nav-link--active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 20%;
+  height: 60%;
+  width: 3px;
+  background: var(--blue-500);
+  border-radius: 0 4px 4px 0;
+}
+
+.sidebar-nav-icon {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sidebar-nav-icon img {
+  width: 22px;
+  height: 22px;
+  display: block;
+}
+
+.sidebar-nav-link--active .sidebar-nav-icon img {
+  filter: invert(43%) sepia(93%) saturate(700%) hue-rotate(180deg) brightness(95%) contrast(90%);
+}
+
+.sidebar-nav-label {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Collapse button */
+.sidebar-collapse-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  margin: 4px 10px;
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 10px;
+  transition: background 0.15s ease, color 0.15s ease;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.sidebar-collapse-btn:hover {
+  background: #f0f3f9;
+  color: var(--ink);
+}
+
+.sidebar-collapse-icon {
+  font-size: 18px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+/* Sidebar footer — brand logo at bottom */
+.sidebar-footer {
+  padding: 16px;
+  border-top: 1px solid var(--line);
+  display: flex;
+  justify-content: center;
+}
+
+.sidebar-footer img {
+  width: 110px;
+  opacity: 0.5;
+  transition: opacity 0.2s ease;
+}
+
+.sidebar-footer img:hover {
+  opacity: 0.8;
+}
+
+/* Collapsed state adjustments */
+.desktop-sidebar--collapsed .sidebar-nav-link {
+  padding: 12px;
+  justify-content: center;
+}
+
+.desktop-sidebar--collapsed .sidebar-nav-link:hover {
+  transform: none;
+}
+
+.desktop-sidebar--collapsed .sidebar-collapse-btn {
+  justify-content: center;
+  padding: 12px;
+  margin: 4px 10px;
+}
+
+/* -----------------------------------------------------------------------
+   SCREEN (MAIN CONTENT) — responsive width expansion
+   ----------------------------------------------------------------------- */
+
+/* Mobile default: capped at 430px (existing behavior preserved) */
+.screen {
+  width: min(100%, 430px);
+  min-height: 100vh;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 24px 8px 120px;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Tablet: allow up to 720px */
+@media (min-width: 576px) and (max-width: 991px) {
+  .screen {
+    max-width: 720px;
+    width: 100%;
+    padding: 28px 20px 120px;
+  }
+}
+
+/* Desktop: full-width content area (sidebar handles the offset) */
+@media (min-width: 992px) {
+  .screen {
+    max-width: 1400px;
+    width: 100%;
+    padding: 40px 60px 60px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .screen--full {
+    padding: 0;
+  }
+
+  /* Override the old mobile-max-width rule */
+  .screen.home-screen,
+  .screen.destinations-gallery-screen,
+  .screen.ilp-screen,
+  .screen.plain-screen {
+    max-width: 1400px;
+    width: 100%;
+  }
+}
+
+@media (min-width: 1400px) {
+  .screen {
+    padding: 48px 80px 60px;
+    max-width: 1600px;
+  }
+}
+
+@media (min-width: 1920px) {
+  .screen {
+    padding: 48px 120px 60px;
+    max-width: 1800px;
+  }
+}
+
+/* -----------------------------------------------------------------------
+   GLOBAL TYPOGRAPHY — desktop scaling
+   ----------------------------------------------------------------------- */
+
+@media (min-width: 992px) {
+  .section-title {
+    font-size: 26px;
+    letter-spacing: -1.2px;
+    margin-bottom: 20px;
+  }
+
+  .brand-logo-text span {
+    font-size: 28px;
+  }
+
+  .brand-tagline {
+    font-size: 18px;
+  }
+
+  h1 {
+    font-size: clamp(28px, 3vw, 46px);
+  }
+
+  .ilp-card-blue h4 {
+    font-size: 28px;
+  }
+
+  .page-head h2 {
+    font-size: 30px;
+  }
+}
+
+/* -----------------------------------------------------------------------
+   HEADER / BRAND — hide mobile header on desktop (sidebar has brand)
+   ----------------------------------------------------------------------- */
+
+@media (min-width: 992px) {
+  /* On desktop, the sidebar has the brand already — hide the top brand wrap */
+  .home-screen .brand-wrap,
+  .brand-wrap {
+    display: none;
+  }
+
+  /* Keep brand visible on pages that don't use the sidebar (ilp, admin login, etc.) */
+  .ilp-screen .brand-wrap,
+  .app-layout--no-nav .brand-wrap {
+    display: block;
+  }
+
+  .top-section {
+    margin-top: 8px;
+    margin-bottom: 32px;
+  }
+}
+
+/* -----------------------------------------------------------------------
+   HOME PAGE — Mobile-like stacked layout (even on desktop)
+   ----------------------------------------------------------------------- */
+
+@media (min-width: 992px) {
+  .home-screen {
+    padding-top: 40px;
+  }
+
+  /* DISABLED: Two-column hero layout wrapper - keeping mobile stacked layout */
+  /* .home-hero-grid {
+    display: grid;
+    grid-template-columns: minmax(340px, 420px) 1fr;
+    gap: 40px;
+    align-items: start;
+    margin-bottom: 48px;
+  } */
+
+  /* DISABLED: Left column sticky positioning */
+  /* .home-hero-left {
+    position: sticky;
+    top: 40px;
+  } */
+
+  /* DISABLED: Right column grid sizing */
+  /* .home-hero-right {
+    min-width: 0;
+  } */
+
+  /* DISABLED: Desktop hero title */
+  /* .home-desktop-title {
+    display: block !important;
+    font-family: 'Inter', 'Karla', sans-serif;
+    font-size: clamp(28px, 2.5vw, 42px);
+    font-weight: 800;
+    letter-spacing: -2px;
+    color: var(--ink);
+    line-height: 1.1;
+    margin-bottom: 20px;
+  } */
+
+  /* Featured destinations - use grid for better space utilization on desktop */
+  .featured_des_horizontal-cards {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 24px;
+    overflow-x: unset;
+    padding-bottom: 0;
+  }
+
+  .featured_des_place-card {
+    width: 100%;
+    flex: none;
+    height: auto;
+    min-height: 300px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .featured_des_place-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 32px rgba(35, 61, 107, 0.14);
+  }
+
+  .featured_des_place-image {
+    height: 180px;
+  }
+
+  /* Service grid - full width centered */
+  .service-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 28px;
+    max-width: 100%;
+  }
+
+  .service-grid button {
+    background: #ffffff;
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 24px 16px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  }
+
+  .service-grid button:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 28px rgba(48, 149, 236, 0.15);
+    border-color: var(--blue-soft);
+  }
+
+  /* AI Planner - better desktop layout */
+  .AI-Plan_planner-card {
+    height: auto;
+    padding: 40px 48px;
+    border-radius: 20px;
+  }
+
+  .AI-Plan_gemini {
+    max-width: 100%;
+  }
+
+  .AI-Plan_input {
+    font-size: 16px;
+    padding: 16px 20px;
+  }
+
+  /* Conduct list - two columns for better space utilization */
+  .conduct-list {
+    columns: 2;
+    gap: 40px;
+    max-width: 100%;
+    padding: 0 0 0 20px;
+  }
+
+  .conduct-list li {
+    break-inside: avoid;
+    margin-bottom: 10px;
+  }
+
+  .conduct-head {
+    font-size: 22px;
+    margin: 40px 0 20px;
+    text-align: left;
+  }
+
+  /* Search bar and ILP card - better width */
+  .search-row {
+    max-width: 100%;
+  }
+
+  .ilp-card-blue {
+    max-width: 100%;
+    padding: 28px 32px;
+  }
+
+  .ilp-glow-wrapper {
+    width: 100%;
+  }
+
+  .stack-section {
+    max-width: 100%;
+  }
+}
+
+@media (min-width: 1400px) {
+  /* Featured destinations - more columns on larger screens */
+  .featured_des_horizontal-cards {
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 28px;
+  }
+
+  /* Larger service icons and spacing */
+  .service-grid {
+    gap: 32px;
+  }
+
+  .service-grid button {
+    padding: 28px 20px;
+  }
+
+  /* AI Planner enhanced */
+  .AI-Plan_planner-card {
+    padding: 48px 56px;
+  }
+
+  /* Destinations gallery larger cards */
+  .destinations-results.grid {
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 32px;
+  }
+}
+
+@media (min-width: 1200px) {
+  /* DISABLED: Wider two-column layouts */
+  /* .home-hero-grid {
+    grid-template-columns: minmax(360px, 440px) 1fr;
+    gap: 56px;
+  } */
+
+  /* .home-second-row {
+    grid-template-columns: 380px 1fr;
+  } */
+}
+
+/* -----------------------------------------------------------------------
+   SEARCH BAR — desktop sizing
+   ----------------------------------------------------------------------- */
+
+@media (min-width: 992px) {
+  .search-row {
+    border-radius: 14px;
+    min-height: 60px;
+    grid-template-columns: 44px auto 52px;
+    background: #ffffff;
+    border: 1.5px solid var(--line);
+    box-shadow: 0 2px 12px rgba(35, 61, 107, 0.07);
+    transition: box-shadow 0.2s ease, border-color 0.2s ease;
+  }
+
+  .search-row:focus-within {
+    border-color: var(--blue-500);
+    box-shadow: 0 4px 20px rgba(48, 149, 236, 0.15);
+  }
+
+  .search-row input {
+    font-size: 17px;
+  }
+}
+
+/* -----------------------------------------------------------------------
+   ILP CARD — desktop
+   ----------------------------------------------------------------------- */
+
+@media (min-width: 992px) {
+  .ilp-card-blue {
+    height: auto;
+    min-height: 220px;
+    padding: 24px 28px 24px 28px;
+    border-radius: 22px;
+  }
+
+  .ilp-apply-button {
+    font-size: 15px;
+  }
+}
+
+/* -----------------------------------------------------------------------
+   DESTINATIONS GALLERY PAGE — desktop layout
+   ----------------------------------------------------------------------- */
+
+@media (min-width: 992px) {
+  .destinations-gallery-screen {
+    padding-top: 32px;
+  }
+
+  /* Gallery header */
+  .gallery-header {
+    margin-bottom: 32px;
+  }
+
+  .gallery-header-top {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+
+  .gallery-title {
+    font-family: 'Inter', 'Karla', sans-serif;
+    font-size: clamp(24px, 2.5vw, 36px);
+    font-weight: 800;
+    letter-spacing: -1.5px;
+    color: var(--ink);
+    margin: 0;
+    flex: 1;
+  }
+
+  /* Two-panel layout: sidebar filters + results */
+  .gallery-desktop-layout {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 32px;
+    align-items: start;
+  }
+
+  /* Sticky filter panel on desktop */
+  .gallery-filter-panel {
+    position: sticky;
+    top: 20px;
+    background: #ffffff;
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: 0 4px 16px rgba(35, 61, 107, 0.07);
+  }
+
+  /* Destinations grid — responsive columns with better space utilization */
+  .destinations-results.grid {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 28px;
+  }
+
+  .destinations-results.grid.compact {
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 20px;
+  }
+
+  /* Destination card — desktop enhancements */
+  .destination-card.grid {
+    width: 100%;
+    transition: transform 0.22s ease, box-shadow 0.22s ease;
+    border-radius: 16px;
+    overflow: hidden;
+    background: #ffffff;
+    border: 1px solid transparent;
+  }
+
+  .destination-card.grid:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 16px 40px rgba(35, 61, 107, 0.14);
+    border-color: var(--line);
+  }
+
+  .destination-card.list {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+  }
+
+  .destination-card.list .destination-image {
+    height: 100%;
+    min-height: 160px;
+    border-radius: 14px 0 0 14px;
+  }
+
+  /* Results area */
+  .gallery-results-area {
+    min-width: 0;
+  }
+
+  /* Search bar in gallery */
+  .search-bar {
+    background: #ffffff;
+    border: 1.5px solid var(--line);
+    border-radius: 14px;
+    box-shadow: 0 2px 10px rgba(35, 61, 107, 0.06);
+  }
+
+  .search-bar:focus-within {
+    border-color: var(--blue-500);
+    box-shadow: 0 4px 18px rgba(48, 149, 236, 0.14);
+  }
+}
+
+@media (min-width: 1200px) {
+  .gallery-desktop-layout {
+    grid-template-columns: 300px 1fr;
+  }
+
+  .destinations-results.grid {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  }
+}
+
+/* -----------------------------------------------------------------------
+   DESTINATION TEMPLATE PAGE — desktop two-column
+   ----------------------------------------------------------------------- */
+
+@media (min-width: 992px) {
+  .destinations-template-screen,
+  .folklore-template-screen {
+    padding-top: 32px;
+  }
+
+  .destination-hero-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    align-items: start;
+    margin-bottom: 40px;
+  }
+
+  .destination-hero-image-col {
+    position: sticky;
+    top: 40px;
+  }
+
+  .destination-hero-image-col img,
+  .destination-hero-image-col .destination-hero-img {
+    width: 100%;
+    height: 480px;
+    object-fit: cover;
+    border-radius: 20px;
+  }
+
+  .destination-content-grid {
+    display: grid;
+    grid-template-columns: 1fr 360px;
+    gap: 32px;
+    align-items: start;
+  }
+
+  .destination-info-sidebar {
+    position: sticky;
+    top: 40px;
+  }
+}
+
+/* -----------------------------------------------------------------------
+   SERVICES PAGES (Cab, Hotel, Experiences) — desktop grid
+   ----------------------------------------------------------------------- */
+
+@media (min-width: 992px) {
+  /* Service listing grids */
+  .service-listings-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 24px;
+  }
+
+  .service-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .service-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 32px rgba(35, 61, 107, 0.13);
+  }
+}
+
+/* -----------------------------------------------------------------------
+   ILP FORMS — desktop centering + two-column fields
+   ----------------------------------------------------------------------- */
+
+@media (min-width: 992px) {
+  .ilp-screen {
+    display: grid;
+    place-items: start center;
+    padding: 40px;
+  }
+
+  .ilp-form-container {
+    width: min(1200px, 100%);
+    margin: 0 auto;
+  }
+
+  .ilp-main-card {
+    max-width: 100%;
+  }
+
+  /* Two-column form fields */
+  .form-two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  /* Application form sections get better spacing */
+  .application-form-section {
+    padding: 32px;
+    border-radius: 20px;
+  }
+
+  /* ILP sponsor dashboard */
+  .ilp-sponsor-dashboard {
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+}
+
+/* -----------------------------------------------------------------------
+   REGISTRATION & FORM PAGES — desktop centering
+   ----------------------------------------------------------------------- */
+
+@media (min-width: 992px) {
+  .registration-screen {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding-top: 40px;
+  }
+
+  .registration-card {
+    max-width: 560px;
+    width: 100%;
+    padding: 36px;
+  }
+
+  .registration-card h2 {
+    font-size: 30px;
+  }
+}
+
+/* -----------------------------------------------------------------------
+   SEARCH PAGE — desktop
+   ----------------------------------------------------------------------- */
+
+@media (min-width: 992px) {
+  .search-screen {
+    padding-top: 32px;
+  }
+
+  .search-results-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+  }
+}
+
+/* -----------------------------------------------------------------------
+   SOS / EMERGENCY PAGES — desktop centering
+   ----------------------------------------------------------------------- */
+
+@media (min-width: 992px) {
+  .sos-screen,
+  .emergency-screen {
+    max-width: 680px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .danger-panel {
+    padding: 24px;
+    border-radius: 20px;
+  }
+}
+
+/* -----------------------------------------------------------------------
+   FLOATING SOS BUTTON — desktop positioning
+   ----------------------------------------------------------------------- */
+
+@media (min-width: 992px) {
+  .floating-sos-btn {
+    bottom: 32px;
+    right: 40px;
+    width: 72px;
+    height: 72px;
+    font-size: 15px;
+  }
+}
+
+/* -----------------------------------------------------------------------
+   FILTER DROPDOWN — desktop panel (not bottom sheet)
+   ----------------------------------------------------------------------- */
+
+@media (min-width: 992px) {
+  /* When in gallery page, filter dropdown is a side panel style, not bottom sheet */
+  .filter-sheet-overlay {
+    align-items: flex-start;
+    background: rgba(15, 23, 42, 0.3);
+  }
+
+  .filter-sheet {
+    border-radius: 20px;
+    max-height: 80vh;
+    margin: 40px auto;
+    width: min(620px, 90%);
+    box-shadow: 0 20px 60px rgba(15, 23, 42, 0.2);
+  }
+}
+
+/* -----------------------------------------------------------------------
+   BOTTOM NAV — hidden on desktop (AppNav sidebar takes over)
+   ----------------------------------------------------------------------- */
+
+@media (min-width: 992px) {
+  .bottom-nav {
+    display: none !important;
+  }
+}
+
+/* -----------------------------------------------------------------------
+   PRIMARY BUTTON — desktop hover improvements
+   ----------------------------------------------------------------------- */
+
+@media (min-width: 992px) {
+  .primary-btn {
+    padding: 0 28px;
+    min-height: 50px;
+    font-size: 15px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+  }
+
+  .primary-btn:not(:disabled):hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(35, 61, 107, 0.15);
+  }
+
+  .secondary-btn {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .secondary-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(35, 61, 107, 0.1);
+  }
+}
+
+/* -----------------------------------------------------------------------
+   TABLET ADJUSTMENTS (576px – 991px)
+   ----------------------------------------------------------------------- */
+
+@media (min-width: 576px) and (max-width: 991px) {
+  /* Featured cards: 2 per row on tablet */
+  .featured_des_horizontal-cards {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+    overflow-x: unset;
+  }
+
+  .featured_des_place-card {
+    width: 100%;
+    flex: none;
+  }
+
+  /* Destination gallery: 2 columns */
+  .destinations-results.grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+
+  /* Service grid: wider gap */
+  .service-grid {
+    gap: 32px;
+  }
+}
+
+/* -----------------------------------------------------------------------
+   PLANNER PAGE — desktop
+   ----------------------------------------------------------------------- */
+
+@media (min-width: 992px) {
+  .planner-screen {
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+/* -----------------------------------------------------------------------
+   PAGE HEAD (back button + title) — desktop
+   ----------------------------------------------------------------------- */
+
+@media (min-width: 992px) {
+  .page-head {
+    margin-bottom: 16px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .page-head h2 {
+    font-size: 28px;
+    font-family: 'Inter', 'Karla', sans-serif;
+  }
+
+  .back-btn {
+    transition: transform 0.15s ease, background 0.15s ease;
+  }
+
+  .back-btn:hover {
+    transform: translateX(-2px);
+  }
+}
+
+/* -----------------------------------------------------------------------
+   INFO CARDS & PANELS — desktop
+   ----------------------------------------------------------------------- */
+
+@media (min-width: 992px) {
+  .info-card,
+  .text-panel {
+    padding: 20px;
+    border-radius: 18px;
+    transition: box-shadow 0.2s ease;
+  }
+
+  .info-card img,
+  .hero-detail-card img {
+    height: 220px;
+  }
+
+  .list-stack {
+    gap: 14px;
+  }
+}
+
+/* -----------------------------------------------------------------------
+   SCREEN FOOTER — desktop
+   ----------------------------------------------------------------------- */
+
+@media (min-width: 992px) {
+  .screen-footer {
+    padding: 32px 0 16px;
+    margin-top: 40px;
+    border-top: 1px solid var(--line);
+  }
+}
+
+/* -----------------------------------------------------------------------
+   ADMIN PAGES — keep as-is on desktop (they have their own sidebar system)
+   App layout no-nav mode for admin
+   ----------------------------------------------------------------------- */
+
+.app-layout--no-nav {
+  flex-direction: column;
+}
+
+.app-layout--no-nav > main.screen {
+  margin-left: 0 !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  padding: 0 !important;
+}
+
+/* -----------------------------------------------------------------------
+   ANIMATIONS & TRANSITIONS — global performance improvements
+   ----------------------------------------------------------------------- */
+
+/* Respect user reduced-motion preference */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Smooth rendering for animated elements */
+.featured_des_place-card,
+.destination-card,
+.service-grid button,
+.sidebar-nav-link,
+.primary-btn,
+.secondary-btn {
+  will-change: transform;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+/* -----------------------------------------------------------------------
+   HOME PAGE — desktop title (hidden on mobile)
+   ----------------------------------------------------------------------- */
+
+.home-desktop-title {
+  display: none;
+}
+
+/* -----------------------------------------------------------------------
+   BOOTSTRAP CONFLICT FIXES
+   ----------------------------------------------------------------------- */
+
+/* Bootstrap sets img { max-width: 100% } — we need this to stay as our CSS has it too */
+/* Bootstrap .container max-widths — we don't use Bootstrap containers but prevent them from
+   interfering if accidentally used in any component */
+
+/* Reset Bootstrap's default link color that might bleed into nav links */
+a.sidebar-nav-link,
+a.sidebar-nav-link:hover,
+a.sidebar-nav-link:visited {
+  color: inherit;
+}
+
+/* Bootstrap sets button font-size to inherit — our existing button styles handle this */
+/* Bootstrap row/column gutter — zero out if Bootstrap grid is used inline */
+.row {
+  --bs-gutter-x: 1.5rem;
+  --bs-gutter-y: 0;
+}
+
+/* Override Bootstrap's body that sets line-height to 1.5 */
+body {
+  line-height: 1.4;
+}
+
+/* -----------------------------------------------------------------------
+   UTILITY CLASSES — responsive helpers used in JSX
+   ----------------------------------------------------------------------- */
+
+/* Hide/show based on breakpoint (used as className in JSX) */
+.desktop-only { display: none; }
+.mobile-only  { display: block; }
+
+@media (min-width: 992px) {
+  .desktop-only { display: block; }
+  .mobile-only  { display: none; }
+  .desktop-flex { display: flex; }
+  .desktop-grid { display: grid; }
+}
+
+/* Content max-width wrapper for desktop */
+.content-container {
+  width: 100%;
+}
+
+@media (min-width: 1400px) {
+  .content-container {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+}
+
