@@ -57,16 +57,45 @@ const ADMIN_PASSWORD = process.env.ILP_ADMIN_PASSWORD || 'admin123';
 const STORAGE_BUCKET = process.env.SUPABASE_BUCKET || process.env.VITE_SUPABASE_BUCKET || 'mizTour';
 const SIGNED_URL_TTL_SECONDS = Number(process.env.SUPABASE_SIGNED_URL_TTL_SECONDS || 3600);
 const PUBLIC_API_BASE_URL = process.env.PUBLIC_API_BASE_URL || '';
-const RAZORPAY_KEY_ID = process.env.RAZORPAY_KEY_ID || '';
-const RAZORPAY_KEY_SECRET = process.env.RAZORPAY_KEY_SECRET || '';
-const RAZORPAY_WEBHOOK_SECRET = process.env.RAZORPAY_WEBHOOK_SECRET || '';
+const normalizeEnvString = (value = '') => String(value || '').trim();
+
+const RAZORPAY_KEY_ID = normalizeEnvString(process.env.RAZORPAY_KEY_ID);
+const RAZORPAY_KEY_SECRET = normalizeEnvString(process.env.RAZORPAY_KEY_SECRET);
+const RAZORPAY_WEBHOOK_SECRET = normalizeEnvString(process.env.RAZORPAY_WEBHOOK_SECRET);
 const ILP_PAYMENT_AMOUNT_PAISE = Number(process.env.ILP_PAYMENT_AMOUNT_PAISE || 5000);
 
-const RAZORPAY_CONFIGURED =
-  Boolean(RAZORPAY_KEY_ID) &&
-  Boolean(RAZORPAY_KEY_SECRET) &&
-  !RAZORPAY_KEY_SECRET.startsWith('YOUR_') &&
-  RAZORPAY_KEY_SECRET !== 'YOUR_RAZORPAY_KEY_SECRET';
+const getRazorpayConfigIssues = () => {
+  const issues = [];
+
+  if (!RAZORPAY_KEY_ID || RAZORPAY_KEY_ID.startsWith('YOUR_') || RAZORPAY_KEY_ID === 'YOUR_RAZORPAY_KEY_ID') {
+    issues.push('RAZORPAY_KEY_ID is missing or still a placeholder');
+  }
+
+  if (
+    !RAZORPAY_KEY_SECRET ||
+    RAZORPAY_KEY_SECRET.startsWith('YOUR_') ||
+    RAZORPAY_KEY_SECRET === 'YOUR_RAZORPAY_KEY_SECRET'
+  ) {
+    issues.push('RAZORPAY_KEY_SECRET is missing or still a placeholder');
+  }
+
+  if (RAZORPAY_KEY_ID && RAZORPAY_KEY_SECRET && RAZORPAY_KEY_ID === RAZORPAY_KEY_SECRET) {
+    issues.push('RAZORPAY_KEY_SECRET must not be the same as RAZORPAY_KEY_ID');
+  }
+
+  if (/^rzp_(test|live)_/i.test(RAZORPAY_KEY_SECRET)) {
+    issues.push('RAZORPAY_KEY_SECRET looks like a key id; use the secret from Razorpay dashboard');
+  }
+
+  if (RAZORPAY_WEBHOOK_SECRET && /^https?:\/\//i.test(RAZORPAY_WEBHOOK_SECRET)) {
+    issues.push('RAZORPAY_WEBHOOK_SECRET must be a shared secret string, not a URL');
+  }
+
+  return issues;
+};
+
+const RAZORPAY_CONFIG_ISSUES = getRazorpayConfigIssues();
+const RAZORPAY_CONFIGURED = RAZORPAY_CONFIG_ISSUES.length === 0;
 
 const getRazorpayClient = () => new Razorpay({ key_id: RAZORPAY_KEY_ID, key_secret: RAZORPAY_KEY_SECRET });
 
@@ -543,14 +572,11 @@ app.post('/api/payments/create-order', async (req, res) => {
   try {
     // Guard: reject early if Razorpay credentials are not configured.
     if (!RAZORPAY_CONFIGURED) {
-      console.error(
-        '[Razorpay] RAZORPAY_KEY_SECRET is not configured. ' +
-        'Set a real secret in tourist-backend/.env and restart the server.'
-      );
+      console.error('[Razorpay] Configuration issues:', RAZORPAY_CONFIG_ISSUES);
       res.status(503).json({
         message:
-          'Payment gateway is not configured on the server. ' +
-          'Please set RAZORPAY_KEY_SECRET in the backend .env file and restart.'
+          'Payment gateway is not configured on the server. Fix Razorpay credentials in backend .env and restart.',
+        causes: RAZORPAY_CONFIG_ISSUES
       });
       return;
     }
@@ -630,7 +656,23 @@ app.post('/api/payments/create-order', async (req, res) => {
         razorpayError?.error?.description ||
         razorpayError?.message ||
         String(razorpayError);
+      const normalizedMessage = String(rzpMessage).toLowerCase();
+      const isAuthFailure =
+        razorpayError?.statusCode === 401 ||
+        normalizedMessage.includes('authentication failed') ||
+        normalizedMessage.includes('unauthorized') ||
+        normalizedMessage.includes('invalid api key');
+
       console.error('[Razorpay] orders.create failed:', rzpMessage, razorpayError);
+
+      if (isAuthFailure) {
+        res.status(502).json({
+          message:
+            'Razorpay authentication failed. Ensure RAZORPAY_KEY_ID and RAZORPAY_KEY_SECRET are from the same Razorpay mode (both test or both live), and that KEY_SECRET is the actual secret (not the key id).'
+        });
+        return;
+      }
+
       res.status(502).json({ message: `Razorpay error: ${rzpMessage}` });
       return;
     }
@@ -1720,10 +1762,10 @@ initializeDatabase()
       if (RAZORPAY_CONFIGURED) {
         console.log(`[Razorpay] ✅ Payment gateway configured (key: ${RAZORPAY_KEY_ID})`);
       } else {
-        console.warn(
-          '[Razorpay] ⚠️  RAZORPAY_KEY_SECRET is not set or is still a placeholder. ' +
-          'Payment endpoints will return 503 until this is fixed in .env'
-        );
+        console.warn('[Razorpay] ⚠️  Payment gateway is misconfigured. Payment endpoints will return 503.');
+        for (const issue of RAZORPAY_CONFIG_ISSUES) {
+          console.warn(`[Razorpay] - ${issue}`);
+        }
       }
     });
   })
