@@ -2,7 +2,111 @@
   "hash": "86997a52",
   "configHash": "99af3a25",
   "lockfileHash": "0df30ee7",
-  "browserHash": "07c4def3",
-  "optimized": {},
-  "chunks": {}
+  "browserHash": "5e956f64",
+  "optimized": {
+    "@mui/icons-material": {
+      "src": "../../node_modules/@mui/icons-material/index.mjs",
+      "file": "@mui_icons-material.js",
+      "fileHash": "54a8319a",
+      "needsInterop": false
+    },
+    "@mui/icons-material/AutoGraphRounded": {
+      "src": "../../node_modules/@mui/icons-material/AutoGraphRounded.mjs",
+      "file": "@mui_icons-material_AutoGraphRounded.js",
+      "fileHash": "f9791b6f",
+      "needsInterop": false
+    },
+    "@mui/icons-material/DirectionsCarFilledRounded": {
+      "src": "../../node_modules/@mui/icons-material/DirectionsCarFilledRounded.mjs",
+      "file": "@mui_icons-material_DirectionsCarFilledRounded.js",
+      "fileHash": "21e6cab5",
+      "needsInterop": false
+    },
+    "@mui/icons-material/VisibilityRounded": {
+      "src": "../../node_modules/@mui/icons-material/VisibilityRounded.mjs",
+      "file": "@mui_icons-material_VisibilityRounded.js",
+      "fileHash": "1976def1",
+      "needsInterop": false
+    },
+    "@tanstack/react-query": {
+      "src": "../../node_modules/@tanstack/react-query/build/modern/index.js",
+      "file": "@tanstack_react-query.js",
+      "fileHash": "eac09f27",
+      "needsInterop": false
+    },
+    "framer-motion": {
+      "src": "../../node_modules/framer-motion/dist/es/index.mjs",
+      "file": "framer-motion.js",
+      "fileHash": "276fda86",
+      "needsInterop": false
+    },
+    "leaflet": {
+      "src": "../../node_modules/leaflet/dist/leaflet-src.js",
+      "file": "leaflet.js",
+      "fileHash": "85990ed8",
+      "needsInterop": true
+    },
+    "react-dom/client": {
+      "src": "../../node_modules/react-dom/client.js",
+      "file": "react-dom_client.js",
+      "fileHash": "199033a5",
+      "needsInterop": true
+    },
+    "react-leaflet": {
+      "src": "../../node_modules/react-leaflet/lib/index.js",
+      "file": "react-leaflet.js",
+      "fileHash": "5ef93646",
+      "needsInterop": false
+    },
+    "react-router-dom": {
+      "src": "../../node_modules/react-router-dom/dist/index.mjs",
+      "file": "react-router-dom.js",
+      "fileHash": "1a847818",
+      "needsInterop": false
+    },
+    "react": {
+      "src": "../../node_modules/react/index.js",
+      "file": "react.js",
+      "fileHash": "e01fc740",
+      "needsInterop": true
+    },
+    "react/jsx-dev-runtime": {
+      "src": "../../node_modules/react/jsx-dev-runtime.js",
+      "file": "react_jsx-dev-runtime.js",
+      "fileHash": "4d0993b0",
+      "needsInterop": true
+    },
+    "recharts": {
+      "src": "../../node_modules/recharts/es6/index.js",
+      "file": "recharts.js",
+      "fileHash": "3a1564f3",
+      "needsInterop": false
+    }
+  },
+  "chunks": {
+    "chunk-D6g4UhsZ": {
+      "file": "chunk-D6g4UhsZ.js",
+      "isDynamicEntry": false
+    },
+    "createSvgIcon-BVTwtBTW": {
+      "file": "createSvgIcon-BVTwtBTW.js",
+      "isDynamicEntry": false
+    },
+    "emotion-is-prop-valid.esm-B2vpnUEa": {
+      "file": "emotion-is-prop-valid.esm-B2vpnUEa.js",
+      "isDynamicEntry": false
+    },
+    "jsx-runtime-BpYYP16K": {
+      "file": "jsx-runtime-BpYYP16K.js",
+      "isDynamicEntry": false
+    },
+    "react-dom-3s1y_lE8": {
+      "file": "react-dom-3s1y_lE8.js",
+      "isDynamicEntry": false
+    },
+    "react-is-Cn_TgI4d": {
+      "file": "react-is-Cn_TgI4d.js",
+      "isDynamicEntry": false
+    }
+  }
 }
