@@ -1,4 +1,0 @@
-/* Tailwind CSS entry point — tw- prefix, no preflight (Bootstrap Reboot handles base styles) */
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
