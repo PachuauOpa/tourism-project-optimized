@@ -13,6 +13,276 @@ dotenv.config({
 
 const { Pool } = pg;
 
+const DEFAULT_DESTINATION_FILTER_CONFIG = {
+  categories: [
+    {
+      key: 'natureExperienceType',
+      title: 'Experience Type',
+      appliesToCategories: ['nature'],
+      options: [
+        { value: 'hiking', label: 'Hiking', description: 'Trail-based exploration' },
+        { value: 'photography', label: 'Photography', description: 'Scenic photo spots' },
+        { value: 'sightseeing', label: 'Sightseeing', description: 'General scenic visits' },
+        { value: 'wildlife-watching', label: 'Wildlife Watching', description: 'Fauna and habitat experiences' },
+        { value: 'adventure-sports', label: 'Adventure Sports', description: 'High-energy outdoor activities' },
+        { value: 'nature-walks', label: 'Nature Walks', description: 'Gentle guided or self walks' }
+      ]
+    },
+    {
+      key: 'trailDifficulty',
+      title: 'Trail Difficulty',
+      appliesToCategories: ['nature'],
+      options: [
+        { value: 'beginner', label: 'Beginner', description: 'Suitable for first-timers' },
+        { value: 'moderate', label: 'Moderate', description: 'Some fitness required' },
+        { value: 'experienced', label: 'Experienced', description: 'Experienced trekkers preferred' }
+      ]
+    },
+    {
+      key: 'timeNeededNature',
+      title: 'Time Needed',
+      appliesToCategories: ['nature'],
+      options: [
+        { value: 'quick-stop', label: 'Quick Stop', bracketText: '1-2 hours', description: 'Short scenic stop' },
+        { value: 'half-day', label: 'Half Day', bracketText: '2-4 hours', description: 'Half-day exploration' },
+        { value: 'full-day', label: 'Full Day', bracketText: '4-8 hours', description: 'Day-long activity' },
+        { value: 'overnight-required', label: 'Overnight Stay Required', description: 'Requires overnight planning' }
+      ]
+    },
+    {
+      key: 'natureAccessibility',
+      title: 'Accessibility',
+      appliesToCategories: ['nature'],
+      options: [
+        { value: 'easy-road-access', label: 'Easy Access by Road', description: 'Direct road approach' },
+        { value: 'short-walk-required', label: 'Short Walk Required', description: 'Brief walk from drop-off' },
+        { value: 'requires-4wd', label: 'Requires 4WD/SUV', description: 'Suitable for off-road vehicles' },
+        { value: 'guided-trek-needed', label: 'Guided Trek Needed', description: 'Local guide recommended' }
+      ]
+    },
+    {
+      key: 'natureDistance',
+      title: 'Distance',
+      appliesToCategories: ['nature'],
+      options: [
+        { value: 'within-50-km', label: 'Within 50 km', description: 'Nearby destinations' },
+        { value: '50-100-km', label: '50-100 km', description: 'Medium travel distance' },
+        { value: '100-200-km', label: '100-200 km', description: 'Long-distance day travel' },
+        { value: '200-plus-km', label: '200+ km', description: 'Extended distance journeys' }
+      ]
+    },
+    {
+      key: 'natureFacilities',
+      title: 'Facilities Available',
+      appliesToCategories: ['nature'],
+      options: [
+        { value: 'parking', label: 'Parking', description: 'Parking available onsite' },
+        { value: 'restrooms', label: 'Restrooms', description: 'Washroom facilities available' },
+        { value: 'guide-services', label: 'Guide Services', description: 'Guides available onsite' },
+        { value: 'camping-allowed', label: 'Camping Allowed', description: 'Camping permitted' },
+        { value: 'food-stalls-nearby', label: 'Food Stalls Nearby', description: 'Nearby food options' },
+        { value: 'lodge-nearby', label: 'Lodge Nearby', description: 'Nearby stay options' }
+      ]
+    },
+    {
+      key: 'cuisineType',
+      title: 'Cuisine Type',
+      appliesToCategories: ['restaurant', 'cafe'],
+      options: [
+        { value: 'mizo-traditional', label: 'Mizo Traditional', description: 'Local traditional cuisine' },
+        { value: 'north-indian', label: 'North Indian', description: 'North Indian dishes' },
+        { value: 'chinese', label: 'Chinese', description: 'Chinese cuisine' },
+        { value: 'continental', label: 'Continental', description: 'Continental dishes' },
+        { value: 'tibetan-nepali', label: 'Tibetan/Nepali', description: 'Tibetan and Nepali specialties' },
+        { value: 'street-food', label: 'Street Food', description: 'Street-style snacks and meals' },
+        { value: 'multi-cuisine', label: 'Multi-Cuisine', description: 'Mixed cuisine options' }
+      ]
+    },
+    {
+      key: 'diningExperience',
+      title: 'Dining Experience',
+      appliesToCategories: ['restaurant', 'cafe'],
+      options: [
+        { value: 'fine-dining', label: 'Fine Dining', description: 'Premium dining setup' },
+        { value: 'casual-dining', label: 'Casual Dining', description: 'Relaxed dining experience' },
+        { value: 'cafe-coffee', label: 'Cafe & Coffee', description: 'Cafe-focused experience' },
+        { value: 'quick-bites', label: 'Quick Bites', description: 'Fast snack stops' },
+        { value: 'rooftop-view-dining', label: 'Rooftop/View Dining', description: 'Dining with scenic views' },
+        { value: 'local-eatery', label: 'Local Eatery', description: 'Popular local eateries' },
+        { value: 'fast-food', label: 'Fast Food', description: 'Quick-service food outlets' }
+      ]
+    },
+    {
+      key: 'priceRange',
+      title: 'Price Range',
+      appliesToCategories: ['restaurant', 'cafe'],
+      options: [
+        { value: 'budget-friendly', label: 'Budget Friendly', bracketText: '₹ - Under ₹300 per person', description: 'Affordable pricing' },
+        { value: 'mid-range', label: 'Mid-Range', bracketText: '₹₹ - ₹300-800 per person', description: 'Mid-tier pricing' },
+        { value: 'premium', label: 'Premium', bracketText: '₹₹₹ - Above ₹800 per person', description: 'Premium pricing' }
+      ]
+    },
+    {
+      key: 'mealType',
+      title: 'Meal Type',
+      appliesToCategories: ['restaurant', 'cafe'],
+      options: [
+        { value: 'breakfast', label: 'Breakfast', description: 'Breakfast offerings' },
+        { value: 'lunch', label: 'Lunch', description: 'Lunch offerings' },
+        { value: 'dinner', label: 'Dinner', description: 'Dinner offerings' },
+        { value: 'snacks-tea', label: 'Snacks & Tea', description: 'Tea-time snacks' },
+        { value: 'all-day-dining', label: 'All Day Dining', description: 'Available across all meal times' }
+      ]
+    },
+    {
+      key: 'specialFeaturesFood',
+      title: 'Special Features',
+      appliesToCategories: ['restaurant', 'cafe'],
+      options: [
+        { value: 'vegetarian-options', label: 'Vegetarian Options', description: 'Vegetarian menu choices' },
+        { value: 'vegan-options', label: 'Vegan Options', description: 'Vegan menu choices' },
+        { value: 'local-specialties', label: 'Local Specialties', description: 'Local specialty dishes' },
+        { value: 'live-music', label: 'Live Music', description: 'Live music events' },
+        { value: 'outdoor-seating', label: 'Outdoor Seating', description: 'Open-air seating options' },
+        { value: 'mountain-valley-view', label: 'Mountain/Valley View', description: 'Scenic view seating' }
+      ]
+    },
+    {
+      key: 'siteType',
+      title: 'Site Type',
+      appliesToCategories: ['heritage'],
+      options: [
+        { value: 'historical-monuments', label: 'Historical Monuments', description: 'Historic landmark sites' },
+        { value: 'museums-galleries', label: 'Museums & Galleries', description: 'Exhibition and museum spaces' },
+        { value: 'religious-sites', label: 'Religious Sites (Churches/Temples)', description: 'Places of worship and heritage faith sites' },
+        { value: 'traditional-villages', label: 'Traditional Villages', description: 'Traditional village experiences' },
+        { value: 'cultural-centers', label: 'Cultural Centers', description: 'Cultural hubs and centers' },
+        { value: 'memorial-sites', label: 'Memorial Sites', description: 'Memorial and remembrance sites' }
+      ]
+    },
+    {
+      key: 'heritageExperienceType',
+      title: 'Experience Type',
+      appliesToCategories: ['heritage'],
+      options: [
+        { value: 'guided-tours-available', label: 'Guided Tours Available', description: 'Tour guides available' },
+        { value: 'self-guided-visit', label: 'Self-Guided Visit', description: 'Explore independently' },
+        { value: 'cultural-performances', label: 'Cultural Performances', description: 'Live cultural showcases' },
+        { value: 'photography-opportunities', label: 'Photography Opportunities', description: 'Photo-friendly heritage spaces' },
+        { value: 'educational-learning', label: 'Educational/Learning', description: 'Learning-oriented visits' },
+        { value: 'spiritual-experience', label: 'Spiritual Experience', description: 'Spiritual and reflective experiences' }
+      ]
+    },
+    {
+      key: 'timeNeededHeritage',
+      title: 'Time Needed',
+      appliesToCategories: ['heritage'],
+      options: [
+        { value: 'quick-visit', label: 'Quick Visit', bracketText: 'Under 1 hour', description: 'Short visit' },
+        { value: '1-2-hours', label: '1-2 hours', description: 'Standard visit time' },
+        { value: 'half-day-heritage', label: 'Half Day', description: 'Half-day exploration' },
+        { value: 'full-day-experience', label: 'Full Day Experience', description: 'Extended immersive visit' }
+      ]
+    },
+    {
+      key: 'bestTimeToVisitHeritage',
+      title: 'Best Time to Visit',
+      appliesToCategories: ['heritage'],
+      options: [
+        { value: 'morning-8-12', label: 'Morning', bracketText: '8 AM - 12 PM', description: 'Best visited in the morning window' },
+        { value: 'afternoon-12-4', label: 'Afternoon', bracketText: '12 PM - 4 PM', description: 'Ideal for afternoon visits' },
+        { value: 'evening-4-7', label: 'Evening', bracketText: '4 PM - 7 PM', description: 'Best for evening explorations' },
+        { value: 'special-events-festivals', label: 'Special Events/Festivals', description: 'Timed around cultural programs and festivals' }
+      ]
+    },
+    {
+      key: 'heritageAccessibility',
+      title: 'Accessibility',
+      appliesToCategories: ['heritage'],
+      options: [
+        { value: 'wheelchair-accessible', label: 'Wheelchair Accessible', description: 'Accessible for wheelchair users' },
+        { value: 'family-friendly', label: 'Family Friendly', description: 'Suitable for families' },
+        { value: 'photography-allowed', label: 'Photography Allowed', description: 'Photography permitted' },
+        { value: 'dress-code-required', label: 'Dress Code Required', description: 'Specific attire guidelines apply' }
+      ]
+    },
+    {
+      key: 'heritageFacilities',
+      title: 'Facilities',
+      appliesToCategories: ['heritage'],
+      options: [
+        { value: 'parking-heritage', label: 'Parking', description: 'Parking available' },
+        { value: 'restrooms-heritage', label: 'Restrooms', description: 'Washroom facilities available' },
+        { value: 'souvenir-shop', label: 'Souvenir Shop', description: 'Souvenir store available' },
+        { value: 'cafe-refreshments', label: 'Cafe/Refreshments', description: 'Refreshment counters or cafe' }
+      ]
+    },
+    {
+      key: 'parkType',
+      title: 'Park Type',
+      appliesToCategories: ['parks'],
+      options: [
+        { value: 'botanical-gardens', label: 'Botanical Gardens', description: 'Botanical collections and landscapes' },
+        { value: 'city-parks', label: 'City Parks', description: 'Urban green spaces' },
+        { value: 'wildlife-sanctuaries', label: 'Wildlife Sanctuaries', description: 'Protected wildlife zones' },
+        { value: 'zoological-parks', label: 'Zoological Parks', description: 'Zoos and animal parks' },
+        { value: 'nature-reserves', label: 'Nature Reserves', description: 'Reserved natural areas' },
+        { value: 'picnic-spots', label: 'Picnic Spots', description: 'Popular picnic destinations' }
+      ]
+    },
+    {
+      key: 'activitiesAvailableParks',
+      title: 'Activities Available',
+      appliesToCategories: ['parks'],
+      options: [
+        { value: 'nature-walks-parks', label: 'Nature Walks', description: 'Walking trails and routes' },
+        { value: 'bird-watching', label: 'Bird Watching', description: 'Bird observation spots' },
+        { value: 'photography-parks', label: 'Photography', description: 'Scenic photography opportunities' },
+        { value: 'picnic', label: 'Picnic', description: 'Picnic-friendly areas' },
+        { value: 'childrens-play-area', label: "Children's Play Area", description: 'Dedicated play areas for children' },
+        { value: 'boating', label: 'Boating', description: 'Boating experiences where available' },
+        { value: 'wildlife-safari', label: 'Wildlife Safari', description: 'Guided wildlife safari activities' }
+      ]
+    },
+    {
+      key: 'timeNeededParks',
+      title: 'Time Needed',
+      appliesToCategories: ['parks'],
+      options: [
+        { value: 'quick-visit-parks', label: 'Quick Visit', bracketText: '1-2 hours', description: 'Short park visit' },
+        { value: 'half-day-parks', label: 'Half Day', bracketText: '2-4 hours', description: 'Half-day outing' },
+        { value: 'full-day-parks', label: 'Full Day', description: 'Full-day park experience' }
+      ]
+    },
+    {
+      key: 'bestForParks',
+      title: 'Best For',
+      appliesToCategories: ['parks'],
+      options: [
+        { value: 'families-with-kids', label: 'Families with Kids', description: 'Family-friendly locations' },
+        { value: 'nature-lovers', label: 'Nature Lovers', description: 'Ideal for nature enthusiasts' },
+        { value: 'photographers', label: 'Photographers', description: 'Photography-focused visitors' },
+        { value: 'couples', label: 'Couples', description: 'Suitable for couples' },
+        { value: 'solo-travelers', label: 'Solo Travelers', description: 'Good for solo exploration' },
+        { value: 'groups', label: 'Groups', description: 'Great for group visits' }
+      ]
+    },
+    {
+      key: 'facilitiesAvailableParks',
+      title: 'Facilities Available',
+      appliesToCategories: ['parks'],
+      options: [
+        { value: 'parking-parks', label: 'Parking', description: 'Parking available' },
+        { value: 'restrooms-parks', label: 'Restrooms', description: 'Washroom facilities available' },
+        { value: 'food-court-stalls', label: 'Food Court/Stalls', description: 'Food options onsite' },
+        { value: 'seating-areas', label: 'Seating Areas', description: 'Resting and seating spaces' },
+        { value: 'walking-paths', label: 'Walking Paths', description: 'Designated walking paths' },
+        { value: 'wheelchair-accessible-parks', label: 'Wheelchair Accessible', description: 'Accessibility support available' }
+      ]
+    }
+  ]
+};
+
 const buildConnectionConfig = () => {
   if (process.env.SUPABASE_DB_URL) {
     return {
@@ -271,6 +541,7 @@ export const initializeDatabase = async () => {
       activity_type TEXT[] NOT NULL DEFAULT '{}',
       destination_type TEXT NOT NULL DEFAULT 'cultural',
       destination_type_tags TEXT[] NOT NULL DEFAULT '{}',
+      destination_filter_tags TEXT[] NOT NULL DEFAULT '{}',
       duration TEXT NOT NULL DEFAULT 'half-day',
       best_time TEXT,
       entry_price TEXT,
@@ -291,6 +562,7 @@ export const initializeDatabase = async () => {
 
   await pool.query('ALTER TABLE destinations ADD COLUMN IF NOT EXISTS curated_by TEXT');
   await pool.query("ALTER TABLE destinations ADD COLUMN IF NOT EXISTS destination_type_tags TEXT[] NOT NULL DEFAULT '{}'");
+  await pool.query("ALTER TABLE destinations ADD COLUMN IF NOT EXISTS destination_filter_tags TEXT[] NOT NULL DEFAULT '{}'");
   await pool.query(`
     UPDATE destinations
     SET destination_type_tags = ARRAY[destination_type]
@@ -329,6 +601,26 @@ export const initializeDatabase = async () => {
   `);
 
   await pool.query('CREATE INDEX IF NOT EXISTS destination_folklore_destination_id_idx ON destination_folklore_stories(destination_id)');
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS admin_settings (
+      id BIGSERIAL PRIMARY KEY,
+      setting_key TEXT NOT NULL UNIQUE,
+      setting_value JSONB NOT NULL,
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    )
+  `);
+
+  await pool.query('CREATE UNIQUE INDEX IF NOT EXISTS admin_settings_setting_key_idx ON admin_settings(setting_key)');
+
+  await pool.query(
+    `
+      INSERT INTO admin_settings (setting_key, setting_value)
+      VALUES ($1, $2::jsonb)
+      ON CONFLICT (setting_key) DO NOTHING
+    `,
+    ['destination_filter_config', JSON.stringify(DEFAULT_DESTINATION_FILTER_CONFIG)]
+  );
 
   await pool.query(`
     CREATE OR REPLACE FUNCTION set_destination_updated_at()

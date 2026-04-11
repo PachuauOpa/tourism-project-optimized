@@ -10,6 +10,63 @@ const normalizeTextArray = (value) => {
     .filter(Boolean);
 };
 
+const DESTINATION_FILTER_CONFIG_KEY = 'destination_filter_config';
+
+const normalizeFilterOption = (option = {}, index = 0) => {
+  const label = String(option.label || '').trim();
+  const value = String(option.value || '').trim();
+
+  return {
+    value,
+    label: label || value,
+    description: String(option.description || '').trim(),
+    bracketText: String(option.bracketText || '').trim() || undefined,
+    sortOrder: Number.isFinite(Number(option.sortOrder)) ? Number(option.sortOrder) : index
+  };
+};
+
+const normalizeFilterCategory = (category = {}, index = 0) => {
+  const options = Array.isArray(category.options)
+    ? category.options
+      .map((option, optionIndex) => normalizeFilterOption(option, optionIndex))
+      .filter((option) => Boolean(option.value))
+      .sort((left, right) => left.sortOrder - right.sortOrder)
+      .map(({ sortOrder, ...option }) => option)
+    : [];
+
+  const normalizedCategoryKey = String(category.key || '').trim();
+
+  return {
+    key: normalizedCategoryKey,
+    title: String(category.title || normalizedCategoryKey).trim(),
+    appliesToCategories: normalizeTextArray(category.appliesToCategories),
+    options,
+    sortOrder: Number.isFinite(Number(category.sortOrder)) ? Number(category.sortOrder) : index
+  };
+};
+
+const normalizeDestinationFilterConfig = (value = {}) => {
+  const categories = Array.isArray(value.categories)
+    ? value.categories
+      .map((category, index) => normalizeFilterCategory(category, index))
+      .filter((category) => Boolean(category.key) && category.options.length > 0)
+      .sort((left, right) => left.sortOrder - right.sortOrder)
+      .map(({ sortOrder, ...category }) => category)
+    : [];
+
+  return { categories };
+};
+
+const fetchDestinationFilterConfig = async (pool) => {
+  const result = await pool.query(
+    'SELECT setting_value FROM admin_settings WHERE setting_key = $1 LIMIT 1',
+    [DESTINATION_FILTER_CONFIG_KEY]
+  );
+
+  const storedValue = result.rows[0]?.setting_value;
+  return normalizeDestinationFilterConfig(storedValue || {});
+};
+
 const resolveVariantLargeUrl = (value) => {
   if (!value) {
     return '';
@@ -95,6 +152,7 @@ const normalizeDestinationPayload = (payload = {}) => {
     activity_type: normalizeTextArray(payload.activity_type || payload.activityType),
     destination_type: destinationType,
     destination_type_tags: destinationTypeTags.length > 0 ? destinationTypeTags : [destinationType],
+    destination_filter_tags: normalizeTextArray(payload.destination_filter_tags || payload.destinationFilterTags),
     duration: String(payload.duration || 'half-day').trim() || 'half-day',
     best_time: String(payload.best_time || payload.bestTime || '').trim() || null,
     entry_price: String(payload.entry_price || payload.entryPrice || '').trim() || null,
@@ -186,6 +244,7 @@ const toDestinationRecord = (row, normalizeMediaUrl = null, req = null) => {
     keyword_tags: row.keyword_tags || [],
     activity_type: row.activity_type || [],
     destination_type_tags: row.destination_type_tags || [],
+    destination_filter_tags: row.destination_filter_tags || [],
     gallery_images: galleryImages,
     folklore_stories: folkloreStories
   };
@@ -420,6 +479,51 @@ export const registerDestinationRoutes = (
     }
   });
 
+  app.get('/api/destination-filters', async (_req, res) => {
+    try {
+      const config = await fetchDestinationFilterConfig(pool);
+      res.json(config);
+    } catch (error) {
+      console.error('Failed to fetch destination filter config:', error);
+      res.status(500).json({ message: 'Failed to fetch destination filter config' });
+    }
+  });
+
+  app.get('/api/admin/destination-filters', requireAdmin, async (_req, res) => {
+    try {
+      const config = await fetchDestinationFilterConfig(pool);
+      res.json(config);
+    } catch (error) {
+      console.error('Failed to fetch admin destination filter config:', error);
+      res.status(500).json({ message: 'Failed to fetch admin destination filter config' });
+    }
+  });
+
+  app.put('/api/admin/destination-filters', requireAdmin, async (req, res) => {
+    try {
+      const normalizedConfig = normalizeDestinationFilterConfig(req.body || {});
+      if (!Array.isArray(normalizedConfig.categories)) {
+        res.status(400).json({ message: 'Invalid filter config payload' });
+        return;
+      }
+
+      await pool.query(
+        `
+          INSERT INTO admin_settings (setting_key, setting_value)
+          VALUES ($1, $2::jsonb)
+          ON CONFLICT (setting_key)
+          DO UPDATE SET setting_value = EXCLUDED.setting_value, updated_at = NOW()
+        `,
+        [DESTINATION_FILTER_CONFIG_KEY, JSON.stringify(normalizedConfig)]
+      );
+
+      res.json(normalizedConfig);
+    } catch (error) {
+      console.error('Failed to update destination filter config:', error);
+      res.status(500).json({ message: 'Failed to update destination filter config' });
+    }
+  });
+
   app.post('/api/admin/destinations', requireAdmin, async (req, res) => {
     const payload = normalizeDestinationPayload(req.body);
 
@@ -435,14 +539,16 @@ export const registerDestinationRoutes = (
         `
           INSERT INTO destinations (
             slug, title, subtitle, curated_by, short_description, about, keyword_tags,
-            region, activity_type, destination_type, destination_type_tags, duration, best_time, entry_price,
+            region, activity_type, destination_type, destination_type_tags, destination_filter_tags,
+            duration, best_time, entry_price,
             difficulty, road_condition_status, rating, travel_time,
             latitude, longitude, header_image_url, featured, is_published
           ) VALUES (
             $1, $2, $3, $4, $5, $6, $7,
-            $8, $9, $10, $11, $12, $13, $14,
-            $15, $16, $17, $18,
-            $19, $20, $21, $22, $23
+            $8, $9, $10, $11, $12,
+            $13, $14, $15,
+            $16, $17, $18, $19,
+            $20, $21, $22, $23, $24
           )
           RETURNING id
         `,
@@ -458,6 +564,7 @@ export const registerDestinationRoutes = (
           payload.activity_type,
           payload.destination_type,
           payload.destination_type_tags,
+          payload.destination_filter_tags,
           payload.duration,
           payload.best_time,
           payload.entry_price,
@@ -530,18 +637,19 @@ export const registerDestinationRoutes = (
             activity_type = $10,
             destination_type = $11,
             destination_type_tags = $12,
-            duration = $13,
-            best_time = $14,
-            entry_price = $15,
-            difficulty = $16,
-            road_condition_status = $17,
-            rating = $18,
-            travel_time = $19,
-            latitude = $20,
-            longitude = $21,
-            header_image_url = $22,
-            featured = $23,
-            is_published = $24
+            destination_filter_tags = $13,
+            duration = $14,
+            best_time = $15,
+            entry_price = $16,
+            difficulty = $17,
+            road_condition_status = $18,
+            rating = $19,
+            travel_time = $20,
+            latitude = $21,
+            longitude = $22,
+            header_image_url = $23,
+            featured = $24,
+            is_published = $25
           WHERE id = $1
           RETURNING id
         `,
@@ -558,6 +666,7 @@ export const registerDestinationRoutes = (
           payload.activity_type,
           payload.destination_type,
           payload.destination_type_tags,
+          payload.destination_filter_tags,
           payload.duration,
           payload.best_time,
           payload.entry_price,
