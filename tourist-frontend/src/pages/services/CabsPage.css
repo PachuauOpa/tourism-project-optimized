@@ -1,0 +1,307 @@
+.cab-page {
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Karla', sans-serif;
+  padding-bottom: 96px;
+  position: relative;
+}
+
+.cab-top-actions {
+  position: absolute;
+  inset-inline: 0;
+  top: 0;
+  z-index: 20;
+  padding: 40px 24px 0;
+}
+
+.cab-top-actions-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.cab-icon-button {
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--card);
+  color: var(--ink);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.cab-icon-button:hover {
+  background: #dde6f5;
+}
+
+.cab-header {
+  padding: 40px 24px 24px;
+  text-align: center;
+}
+
+.cab-header-title {
+  margin: 0 0 8px;
+  font-size: 32px;
+  line-height: 1.05;
+  font-weight: 700;
+  letter-spacing: -1px;
+}
+
+.cab-header-subtitle {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+  letter-spacing: -0.2px;
+}
+
+.cab-location-note {
+  margin: 8px 0 0;
+  color: #7b8798;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.cab-menu-popover {
+  position: absolute;
+  top: 84px;
+  right: 24px;
+  z-index: 30;
+  min-width: 200px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--white);
+  border: 1px solid var(--line);
+  box-shadow: 0 14px 32px rgba(20, 30, 50, 0.16);
+}
+
+.cab-menu-action {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  padding: 12px 16px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.cab-menu-action:hover {
+  background: #eef3fb;
+}
+
+.cab-menu-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.cab-services-list {
+  width: 100%;
+  max-width: 448px;
+  margin: 0 auto;
+  padding: 0 16px 48px;
+  display: grid;
+  gap: 16px;
+}
+
+.cab-service-card {
+  background: linear-gradient(165deg, #eef3fb 0%, #e6edf8 100%);
+  border: 1px solid #d9e3f1;
+  border-radius: 18px;
+  box-shadow: var(--shadow-soft);
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+}
+
+.cab-service-head {
+  margin-bottom: 24px;
+}
+
+.cab-service-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.cab-service-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+}
+
+.cab-service-title {
+  margin: 0;
+  font-size: 20px;
+  line-height: 1.1;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.cab-tag-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+
+.cab-tag {
+  background: #eef4ff;
+  color: #315073;
+  border-radius: 999px;
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.cab-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  border-top: 1px solid #d9e3f1;
+  border-bottom: 1px solid #d9e3f1;
+  padding: 16px 0;
+  margin-bottom: 24px;
+}
+
+.cab-stat-full {
+  grid-column: 1 / -1;
+}
+
+.cab-stat-label {
+  margin: 0 0 4px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.cab-stat-value {
+  margin: 0;
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.cab-star {
+  color: #f5ba2e;
+}
+
+.cab-start-price {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.cab-loading-text {
+  color: var(--muted);
+  text-align: center;
+  font-size: 14px;
+  margin-bottom: 24px;
+}
+
+.cab-nearby-list {
+  margin-bottom: 24px;
+}
+
+.cab-nearby-title {
+  margin: 0 0 12px;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.cab-nearby-item {
+  background: #f6f9ff;
+  border: 1px solid #dbe6f7;
+  border-radius: 12px;
+  padding: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.cab-nearby-item + .cab-nearby-item {
+  margin-top: 10px;
+}
+
+.cab-nearby-vehicle {
+  margin: 0;
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.cab-nearby-owner {
+  margin: 2px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.cab-distance-pill {
+  background: var(--blue-soft);
+  color: #315073;
+  border: 1px solid #ccdaec;
+  border-radius: 8px;
+  padding: 4px 8px;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.cab-cta {
+  margin-top: auto;
+  width: 100%;
+  display: block;
+  text-align: center;
+  color: var(--white);
+  text-decoration: none;
+  border-radius: 12px;
+  padding: 14px 16px;
+  font-size: 14px;
+  font-weight: 700;
+  transition: opacity 0.2s ease;
+}
+
+.cab-cta-button {
+  border: 0;
+  cursor: pointer;
+}
+
+.cab-cta:hover {
+  opacity: 0.9;
+}
+
+@media (max-width: 640px) {
+  .cab-header-title {
+    font-size: 32px;
+    text-align: left;
+  }
+
+  .cab-header {
+    text-align: left;
+    padding-top: 96px;
+  }
+
+  .cab-service-card {
+    padding: 24px;
+  }
+
+  .cab-service-title {
+    font-size: 20px;
+  }
+}

@@ -8,6 +8,7 @@ import Razorpay from 'razorpay';
 import { createClient } from '@supabase/supabase-js';
 import { initializeDatabase, pool } from './db.js';
 import { registerDestinationRoutes } from './destinationRoutes.js';
+import vehicleRoutes from './vehicleRoutes.js';
 import {
   buildStorageAssetUrl,
   buildVariantStoragePaths,
@@ -1754,6 +1755,8 @@ registerDestinationRoutes(app, {
   normalizeDestinationMediaUrl,
   cleanupMediaAssets: deleteDestinationMediaAssets
 });
+
+app.use('/api/vehicles', vehicleRoutes);
 
 initializeDatabase()
   .then(() => {

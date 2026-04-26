@@ -27,9 +27,7 @@ import {
   DESTINATION_CATEGORY_OPTIONS,
   getDefaultAppliesToCategoriesForFilterGroup
 } from '../../data/destinationFilterConfig';
-import DashboardIcon from '../../components/admin/DashboardIcon';
 import DestinationIcon from '../../components/admin/DestinationIcon';
-import CabIcon from '../../components/admin/CabIcon';
 import HotelIcon from '../../components/admin/HotelIcon';
 import EventIcon from '../../components/admin/EventIcon';
 
@@ -469,6 +467,144 @@ const AdminPage: React.FC = () => {
   const [isMapFullScreen, setIsMapFullScreen] = useState<boolean>(false);
   const [isPreviewOpen, setIsPreviewOpen] = useState<boolean>(false);
   const [userLocation, setUserLocation] = useState<{ latitude: number; longitude: number } | null>(null);
+
+  // --- Cab Management States ---
+  const [cabs, setCabs] = useState<any[]>([]);
+  const [cabsLoading, setCabsLoading] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (activeSection === 'cabs' && token) {
+      setCabsLoading(true);
+      fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:4000'}/api/vehicles/admin`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+        .then(async (res) => {
+          if (!res.ok) {
+            throw new Error('Failed to fetch cab records');
+          }
+
+          return res.json();
+        })
+        .then((data) => {
+          const vehicles = Array.isArray(data)
+            ? data
+            : Array.isArray(data?.vehicles)
+              ? data.vehicles
+              : [];
+
+          setCabs(vehicles);
+          setCabsLoading(false);
+        })
+        .catch((err) => {
+          console.error(err);
+          setError('Failed to load cabs');
+          setCabsLoading(false);
+        });
+    }
+  }, [activeSection, token]);
+
+  const handleUpdateCabStatus = async (id: number, status: string) => {
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:4000'}/api/vehicles/admin/${id}/status`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ status }),
+      });
+      if (res.ok) {
+        setCabs((prev) => prev.map((c) => (c.id === id ? { ...c, status } : c)));
+      } else {
+        setError('Failed to update cab status');
+      }
+    } catch (err) {
+      console.error(err);
+      setError('Error updating cab status');
+    }
+  };
+
+  const renderCabsManager = () => {
+    return (
+      <section className="admin-cabs-manager">
+        <header className="admin-destination-header">
+          <h2>Cabs & Rentals Approvals</h2>
+          <p>Review and verify vehicle registrations.</p>
+        </header>
+        {cabsLoading ? (
+          <p className="admin-cabs-loading">Loading cab registrations...</p>
+        ) : (
+          <div className="admin-cabs-table-wrap">
+            <table className="admin-cabs-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Category / Type</th>
+                  <th>Registration No.</th>
+                  <th>Owner</th>
+                  <th>Status</th>
+                  <th className="admin-cabs-cell-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {cabs.map((c) => (
+                  <tr key={c.id}>
+                    <td className="admin-cabs-id">#{c.id}</td>
+                    <td>
+                      <div className="admin-cabs-primary capitalize">{c.vehicle_category}</div>
+                      <div className="admin-cabs-secondary">
+                        {c.vehicle_type} - {c.manufacturer_model}
+                      </div>
+                    </td>
+                    <td className="admin-cabs-mono">{c.registration_number}</td>
+                    <td>
+                      <div className="admin-cabs-primary">{c.owner_name}</div>
+                      <div className="admin-cabs-secondary">{c.owner_contact}</div>
+                    </td>
+                    <td>
+                      {(() => {
+                        const cabStatus = c.status || 'pending';
+                        return (
+                          <span className={`admin-cabs-status admin-cabs-status-${cabStatus}`}>
+                            {cabStatus}
+                          </span>
+                        );
+                      })()}
+                    </td>
+                    <td className="admin-cabs-cell-right">
+                      {c.status !== 'approved' && (
+                        <button
+                          onClick={() => handleUpdateCabStatus(c.id, 'approved')}
+                          className="admin-cabs-action admin-cabs-action-approve"
+                        >
+                          Approve
+                        </button>
+                      )}
+                      {c.status !== 'rejected' && (
+                        <button
+                          onClick={() => handleUpdateCabStatus(c.id, 'rejected')}
+                          className="admin-cabs-action admin-cabs-action-reject"
+                        >
+                          Reject
+                        </button>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+                {cabs.length === 0 && (
+                  <tr>
+                    <td colSpan={6} className="admin-cabs-empty">
+                      No vehicles found.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </section>
+    );
+  };
 
   const handleExpiredSession = () => {
     localStorage.removeItem(TOKEN_KEY);
@@ -1730,7 +1866,7 @@ const AdminPage: React.FC = () => {
 
           {activeSection === 'destinations' ? renderDestinationsManager() : null}
           {activeSection === 'dashboard' ? <ComingSoonSection title="Dashboard" /> : null}
-          {activeSection === 'cabs' ? <ComingSoonSection title="Cabs" /> : null}
+          {activeSection === 'cabs' ? renderCabsManager() : null}
           {activeSection === 'hotels' ? <ComingSoonSection title="Hotels" /> : null}
           {activeSection === 'events' ? <ComingSoonSection title="Events" /> : null}
         </main>

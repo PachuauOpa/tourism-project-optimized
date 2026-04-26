@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Screen from '../components/shared/Screen';
 import AnimatedSection from '../components/shared/AnimatedSection';
@@ -7,17 +7,27 @@ import BottomNav from '../components/shared/BottomNav';
 import SearchIcon from '../components/SearchIcon';
 import FilterIcon from '../components/FilterIcon';
 import FilterDropdown from '../components/FilterDropdown';
-import MandatoryIcon from '../components/MandatoryIcon';
-import ArrowUpRightIcon from '../components/ArrowUpRightIcon';
-import ClockIcon from '../components/ClockIcon';
 import CarRentalIcon from '../components/CarRentalIcon';
 import StaysIcon from '../components/StaysIcon';
 import ExperiencesIcon from '../components/ExperiencesIcon';
 import AIIcon from '../components/AIIcon';
 import { ActiveFilters, Destination, ManagedDestinationRecord } from '../types';
 import { fetchManagedDestinations, toDestinationCards } from '../utils/destinationApi';
-import { getCachedUserLocation, requestUserLocation } from '../utils/geolocation';
-import useFavoriteDestinations from '../hooks/useFavoriteDestinations';
+
+const FeaturedLocationIcon: React.FC = () => (
+  <svg width="18" height="22" viewBox="0 0 18 22" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <path
+      d="M8.51304 20.2C8.51304 20.2 16.0261 13.5217 16.0261 8.51304C16.0261 4.3637 12.6624 1 8.51304 1C4.3637 1 1 4.3637 1 8.51304C1 13.5217 8.51304 20.2 8.51304 20.2Z"
+      stroke="#3095EC"
+      strokeWidth="2"
+    />
+    <path
+      d="M10.9134 8.20015C10.9134 9.52563 9.83883 10.6002 8.51335 10.6002C7.18787 10.6002 6.11335 9.52563 6.11335 8.20015C6.11335 6.87467 7.18787 5.80015 8.51335 5.80015C9.83883 5.80015 10.9134 6.87467 10.9134 8.20015Z"
+      stroke="#3095EC"
+      strokeWidth="2"
+    />
+  </svg>
+);
 
 const HomePage: React.FC = () => {
   const navigate = useNavigate();
@@ -30,42 +40,24 @@ const HomePage: React.FC = () => {
   const [managedDestinations, setManagedDestinations] = useState<ManagedDestinationRecord[]>([]);
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [isDestinationsLoading, setIsDestinationsLoading] = useState<boolean>(true);
-  const { isFavorite, toggleFavorite } = useFavoriteDestinations();
 
-  const destinationCards: Destination[] = useMemo(
-    () => toDestinationCards(managedDestinations),
-    [managedDestinations]
-  );
+  const destinationCards: Destination[] = toDestinationCards(managedDestinations);
 
-  const featuredCards: Destination[] = useMemo(() => {
+  const featuredCards: Destination[] = (() => {
     const featuredOnly = destinationCards.filter((item) => item.featured);
     return (featuredOnly.length > 0 ? featuredOnly : destinationCards).slice(0, 8);
-  }, [destinationCards]);
+  })();
 
   useEffect(() => {
-    const cachedLocation = getCachedUserLocation();
-    if (cachedLocation) {
-      setUserLocation(cachedLocation);
-      return;
+    if ('geolocation' in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setUserLocation({ lat: position.coords.latitude, lng: position.coords.longitude });
+        },
+        (error) => { console.warn('Location access denied on HomePage:', error.message); },
+        { timeout: 10000, enableHighAccuracy: true, maximumAge: 0 }
+      );
     }
-
-    const timerId = window.setTimeout(() => {
-      void requestUserLocation({
-        timeout: 3500,
-        enableHighAccuracy: false,
-        maximumAge: 5 * 60 * 1000
-      })
-        .then((location) => {
-          setUserLocation(location);
-        })
-        .catch(() => {
-          // Home feed works without location; distance enrichment stays optional.
-        });
-    }, 1200);
-
-    return () => {
-      window.clearTimeout(timerId);
-    };
   }, []);
 
   useEffect(() => {
@@ -125,17 +117,17 @@ const HomePage: React.FC = () => {
     navigate(`/destinations-template/${encodeURIComponent(destinationId)}`);
   };
 
-  const handleToggleFavorite = (destinationId: string): void => {
-    const result = toggleFavorite(destinationId);
-    if (!result.ok && result.reason === 'AUTH_REQUIRED') {
-      navigate('/profile');
-    }
-  };
-
   const truncateFeaturedDescription = (text: string, maxLength = 95): string => {
     if (text.length <= maxLength) return text;
     const trimmed = text.slice(0, maxLength).trimEnd().replace(/[\s.,;:!?-]+$/g, '');
     return `${trimmed}.....`;
+  };
+
+  const formatDistanceLabel = (text: string): string => {
+    return text
+      .replace(/\s*from your location/gi, '')
+      .replace(/\s*(--|—|–|-)\s*$/g, '')
+      .trim();
   };
 
   const handleSearchSubmit = (event: React.FormEvent) => {
@@ -161,47 +153,56 @@ const HomePage: React.FC = () => {
 
   const filterCount = Object.values(activeFilters).reduce((total, f) => total + f.length, 0);
   const filterChipClass = `filter-chip ${filterCount > 0 ? 'filter-chip-active' : ''} ${isFilterOpen ? 'filter-chip-open' : ''}`;
+  const visitorConductItems = [
+    'Keep Mizoram pristine, carry your waste and leave no trace.',
+    'Respect the YMA and local community governance.',
+    'Sunday is a day of rest, nearby services close.',
+    'Alcohol is regulated, check local guidelines.',
+    'Seek permission before photographing people or churches.',
+  ];
 
   return (
     <Screen className="home-screen">
       {/* ── Header / Brand ── */}
-      <AnimatedSection delay={0.03} className="top-section">
-        <HeaderLogo />
+      <AnimatedSection delay={0.03} className="top-section home-hero-top">
+          <HeaderLogo />
 
-        <form className="search-row" onSubmit={handleSearchSubmit}>
-          <SearchIcon size={24} className="search-icon" />
-          <input
-            placeholder="Search destination or service"
-            value={searchValue}
-            onChange={(e) => setSearchValue(e.target.value)}
-          />
-          <button type="button" className={filterChipClass} onClick={handleFilterToggle}>
-            <FilterIcon size={16} />
-            {filterCount > 0 && <span className="filter-count">{filterCount}</span>}
-          </button>
-          <FilterDropdown
-            isOpen={isFilterOpen}
-            onClose={() => setIsFilterOpen(false)}
-            onApplyFilters={handleFilterApply}
-          />
-        </form>
-      </AnimatedSection>
+          <form className="search-row" onSubmit={handleSearchSubmit}>
+            <SearchIcon size={24} className="search-icon" />
+            <input
+              placeholder="Search destination or service"
+              value={searchValue}
+              onChange={(e) => setSearchValue(e.target.value)}
+            />
+            <button type="button" className={filterChipClass} onClick={handleFilterToggle}>
+              <FilterIcon size={16} />
+              {filterCount > 0 && <span className="filter-count">{filterCount}</span>}
+            </button>
+            <FilterDropdown
+              isOpen={isFilterOpen}
+              onClose={() => setIsFilterOpen(false)}
+              onApplyFilters={handleFilterApply}
+            />
+          </form>
+        </AnimatedSection>
 
       {/* ── Entry Requirement ── */}
-      <AnimatedSection delay={0.08} className="stack-section">
-        <h3 className="section-title">Entry Requirement</h3>
+      <AnimatedSection delay={0.06} className="stack-section home-ilp-section-mobile">
         <div className="ilp-glow-wrapper">
-          <div className="ilp-border"></div>
+          <div className="ilp-border" />
           <div className="ilp-card-blue">
-            <div className="mandatory-badge">
-              <MandatoryIcon size={20} />
-              <span>Mandatory</span>
+            <div className="home-ilp-topline">
+              <div className="mandatory-badge">
+                <img src="/icons/ilp-mandatory.svg" alt="Mandatory" />
+                Mandatory
+              </div>
+              <p className="home-ilp-right-title">Entry Requirement</p>
             </div>
             <h4>Inner Line Permit (ILP)</h4>
-            <p>Apply digitally, QR-code ILP, breeze through checkpoints even offline.</p>
+            <p>Apply digitally, QR-code ILP, Breeze through checkpoints -- even offline.</p>
             <button type="button" className="ilp-apply-button" onClick={() => navigate('/ilp')}>
               Apply now
-              <ArrowUpRightIcon size={11} />
+              <img src="/icons/ilp-arrow.svg" alt="" aria-hidden="true" />
             </button>
           </div>
         </div>
@@ -209,7 +210,7 @@ const HomePage: React.FC = () => {
       </AnimatedSection>
 
       {/* ── Featured Destinations ── */}
-      <AnimatedSection delay={0.12} className="stack-section">
+      <AnimatedSection delay={0.12} className="stack-section home-featured-section">
         <h3 className="section-title">Featured Destinations</h3>
         <div className="featured_des_horizontal-cards">
           {isDestinationsLoading
@@ -227,40 +228,26 @@ const HomePage: React.FC = () => {
             ))
             : featuredCards.map((place) => (
               <article className="featured_des_place-card" key={place.id}>
-                <img
-                  src={place.image}
-                  alt={place.name}
-                  className="featured_des_place-image"
-                  width={640}
-                  height={360}
-                  loading="lazy"
-                  decoding="async"
-                />
+                <img src={place.image} alt={place.name} className="featured_des_place-image" />
                 <h4>{place.name}</h4>
                 <p>{truncateFeaturedDescription(place.short)}</p>
                 <div className="featured_des_card-foot">
                   <small>
-                    <ClockIcon size={12} />
-                    {place.time}
+                    <FeaturedLocationIcon />
+                    {formatDistanceLabel(place.time)}
                   </small>
-                  <div className="featured_des_card-actions">
-                    <button
-                      type="button"
-                      className={`favorite-icon-btn ${isFavorite(place.id) ? 'active' : ''}`}
-                      onClick={() => handleToggleFavorite(place.id)}
-                      aria-label={isFavorite(place.id) ? `Remove ${place.name} from favorites` : `Add ${place.name} to favorites`}
-                    >
-                      ❤
-                    </button>
-                    <button
-                      type="button"
-                      className="featured-open-btn"
-                      onClick={() => handleOpenDestination(place.id)}
-                      aria-label={`Open ${place.name}`}
-                    >
-                      <img src="/icons/Arrow up-right.png" alt="Open" width="16" height="16" />
-                    </button>
-                  </div>
+                  <button type="button" onClick={() => handleOpenDestination(place.id)} aria-label={`Open ${place.name}`}>
+                    <span>Read more</span>
+                    <svg width="16" height="16" viewBox="0 0 11 11" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                      <path
+                        d="M1 9.33333L9.33333 1M9.33333 1H1M9.33333 1V9.33333"
+                        stroke="#3095EC"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  </button>
                 </div>
               </article>
             ))}
@@ -270,7 +257,7 @@ const HomePage: React.FC = () => {
           <p className="featured_des_empty">No destinations are published yet.</p>
         )}
 
-        <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px' }}>
+        <div className="home-featured-actions" style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px' }}>
           <button
             type="button"
             className="primary-btn"
@@ -283,7 +270,7 @@ const HomePage: React.FC = () => {
       </AnimatedSection>
 
       {/* ── Essential Services ── */}
-      <AnimatedSection delay={0.18} className="stack-section">
+      <AnimatedSection delay={0.18} className="stack-section home-services-section">
         <h3 className="section-title">Essential Services</h3>
         <div className="service-grid">
           <button type="button" onClick={() => navigate('/service/cab-rentals')}>
@@ -323,15 +310,11 @@ const HomePage: React.FC = () => {
         </div>
       </AnimatedSection>
 
-      {/* ── Code of Conduct ── */}
-      <AnimatedSection delay={0.26} className="stack-section">
+      {/* ── Code of Conduct (Mobile) ── */}
+      <AnimatedSection delay={0.26} className="stack-section home-mobile-only">
         <h3 className="conduct-head">VISITOR CODE OF CONDUCT</h3>
         <ul className="conduct-list">
-          <li>Keep Mizoram pristine, carry your waste and leave no trace.</li>
-          <li>Respect the YMA and local community governance.</li>
-          <li>Sunday is a day of rest, nearby services close.</li>
-          <li>Alcohol is regulated, check local guidelines.</li>
-          <li>Seek permission before photographing people or churches.</li>
+          {visitorConductItems.map((item) => <li key={item}>{item}</li>)}
         </ul>
       </AnimatedSection>
 
@@ -347,7 +330,7 @@ const HomePage: React.FC = () => {
       )}
 
       <footer className="screen-footer">
-        <img src="/icons/lushai-tech.svg" alt="LushAiTech" width="121" height="32" loading="lazy" decoding="async" />
+        <img src="/icons/lushai-tech.svg" alt="LushAiTech" />
       </footer>
 
       <BottomNav />

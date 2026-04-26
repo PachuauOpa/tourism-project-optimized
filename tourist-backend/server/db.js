@@ -669,4 +669,78 @@ export const initializeDatabase = async () => {
     FOR EACH ROW
     EXECUTE FUNCTION sync_destination_geom()
   `);
+
+  console.log('Creating vehicle registry tables...');
+  
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS passenger_vehicles (
+      id SERIAL PRIMARY KEY,
+      registration_number VARCHAR(100) UNIQUE NOT NULL,
+      vehicle_category VARCHAR(50) NOT NULL, -- taxi, private, rental
+      vehicle_type VARCHAR(50) NOT NULL, -- Car, Van, Bus, Auto, etc
+      manufacturer_model VARCHAR(150),
+      fuel_type VARCHAR(50),
+      seating_capacity INTEGER,
+      year_of_manufacture INTEGER,
+      owner_name VARCHAR(150),
+      owner_contact VARCHAR(100),
+      owner_address TEXT,
+      latitude DOUBLE PRECISION,
+      longitude DOUBLE PRECISION,
+      geom GEOMETRY(Point, 4326),
+      cover_image VARCHAR(255),
+      status VARCHAR(50) DEFAULT 'pending', -- pending, approved, rejected
+      created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS taxi_details (
+      vehicle_id INTEGER PRIMARY KEY REFERENCES passenger_vehicles(id) ON DELETE CASCADE,
+      permit_type VARCHAR(100),
+      permit_number VARCHAR(100),
+      taxi_license_number VARCHAR(100),
+      driver_name VARCHAR(150),
+      driver_license VARCHAR(100),
+      badge_number VARCHAR(100)
+    )
+  `);
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS rental_details (
+      vehicle_id INTEGER PRIMARY KEY REFERENCES passenger_vehicles(id) ON DELETE CASCADE,
+      organization_name VARCHAR(150),
+      business_type VARCHAR(100),
+      contact_person VARCHAR(150),
+      service_type VARCHAR(100),
+      operating_areas TEXT
+    )
+  `);
+
+  await pool.query(`
+    CREATE OR REPLACE FUNCTION sync_vehicle_geom()
+    RETURNS trigger AS $$
+    BEGIN
+      IF NEW.latitude IS NOT NULL AND NEW.longitude IS NOT NULL THEN
+        NEW.geom := ST_SetSRID(ST_MakePoint(NEW.longitude, NEW.latitude), 4326);
+      END IF;
+      RETURN NEW;
+    END;
+    $$ LANGUAGE plpgsql;
+  `);
+
+  await pool.query('DROP TRIGGER IF EXISTS trg_vehicles_sync_geom ON passenger_vehicles');
+  await pool.query(`
+    CREATE TRIGGER trg_vehicles_sync_geom
+    BEFORE INSERT OR UPDATE ON passenger_vehicles
+    FOR EACH ROW
+    EXECUTE FUNCTION sync_vehicle_geom()
+  `);
+
+  await pool.query('CREATE INDEX IF NOT EXISTS idx_passenger_vehicles_category ON passenger_vehicles(vehicle_category)');
+  await pool.query('CREATE INDEX IF NOT EXISTS idx_passenger_vehicles_status ON passenger_vehicles(status)');
+  await pool.query('CREATE INDEX IF NOT EXISTS idx_passenger_vehicles_geom ON passenger_vehicles USING GIST(geom)');
+
+  console.log('Vehicle tables initialized successfully');
 };

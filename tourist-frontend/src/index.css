@@ -1476,12 +1476,17 @@ select {
   right: 24px;
   width: 64px;
   height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
   border-radius: 50%;
   border: none;
   background: #EF4A42;
   color: white;
   font-family: 'Karla', sans-serif;
   font-size: 14px;
+  line-height: 1;
   font-weight: 700;
   letter-spacing: -0.5px;
   cursor: pointer;
@@ -9372,12 +9377,12 @@ body {
    ----------------------------------------------------------------------- */
 
 @media (min-width: 992px) {
-  .floating-sos-btn {
-    bottom: 32px;
-    right: 40px;
-    width: 72px;
-    height: 72px;
-    font-size: 15px;
+  .home-screen .floating-sos-btn {
+    bottom: 100px;
+    right: 24px;
+    width: 64px;
+    height: 64px;
+    font-size: 14px;
   }
 }
 
@@ -9644,349 +9649,6 @@ body {
     margin: 0 auto;
   }
 }
-
-/* =======================================================================
-   HOME PAGE — DESKTOP LAYOUT
-   Breakpoint: 992px+ for desktop/landscape views
-   Reuses all mobile components, only rearranges layout
-   ======================================================================= */
-
-@media (min-width: 992px) {
-  /* Remove mobile width constraint for desktop */
-  .home-screen.screen {
-    width: 100%;
-    max-width: 1400px;
-    padding: 32px 48px 120px;
-  }
-
-  /* Top section with logo and search */
-  .home-screen .top-section {
-    display: grid;
-    grid-template-columns: 1fr minmax(400px, 600px) 1fr;
-    align-items: center;
-    gap: 32px;
-    margin-top: 24px;
-    margin-bottom: 64px;
-  }
-
-  .home-screen .top-section .brand-wrap {
-    display: block !important;
-    justify-self: start;
-    text-align: left;
-    margin-bottom: 0;
-  }
-
-  .home-screen .top-section .search-row {
-    margin: 0;
-    grid-column: 2;
-  }
-
-  /* Entry Requirement / ILP Section */
-  .home-screen .stack-section:has(.ilp-glow-wrapper) {
-    display: grid;
-    grid-template-columns: 1fr;
-    max-width: 800px;
-    margin-left: auto;
-    margin-right: auto;
-    margin-bottom: 64px;
-  }
-
-  .home-screen .ilp-glow-wrapper {
-    width: 100%;
-  }
-
-  .home-screen .ilp-card-blue {
-    min-height: 200px;
-    padding: 28px 32px;
-  }
-
-  .home-screen .ilp-card-blue h4 {
-    font-size: 28px;
-  }
-
-  .home-screen .ilp-card-blue p {
-    font-size: 17px;
-    max-width: 60%;
-  }
-
-  /* Featured Destinations - Grid layout */
-  .home-screen .stack-section:has(.featured_des_horizontal-cards) {
-    margin-bottom: 64px;
-  }
-
-  .home-screen .stack-section:has(.featured_des_horizontal-cards) .section-title {
-    font-size: 32px;
-    margin-bottom: 24px;
-  }
-
-  .home-screen .featured_des_horizontal-cards {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 24px;
-    overflow-x: visible;
-  }
-
-  .home-screen .featured_des_place-card {
-    width: 100%;
-    flex: none;
-    height: auto;
-    min-height: 320px;
-    transition: transform 0.25s ease, box-shadow 0.25s ease;
-  }
-
-  .home-screen .featured_des_place-card:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 16px 40px rgba(35, 61, 107, 0.14);
-  }
-
-  .home-screen .featured_des_place-image {
-    height: 180px;
-  }
-
-  .home-screen .featured_des_place-card h4 {
-    font-size: 18px;
-  }
-
-  .home-screen .featured_des_place-card p {
-    font-size: 12px;
-  }
-
-  /* Essential Services - Horizontal cards */
-  .home-screen .stack-section:has(.service-grid) {
-    margin-bottom: 64px;
-  }
-
-  .home-screen .stack-section:has(.service-grid) .section-title {
-    font-size: 32px;
-    text-align: center;
-    margin-bottom: 40px;
-  }
-
-  .home-screen .service-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 32px;
-    max-width: 900px;
-    margin: 0 auto;
-  }
-
-  .home-screen .service-grid button {
-    background: #ffffff;
-    padding: 32px 24px;
-    border-radius: 20px;
-    box-shadow: 0 8px 24px rgba(35, 61, 107, 0.06);
-    border: 1px solid transparent;
-    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
-  }
-
-  .home-screen .service-grid button:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 16px 40px rgba(35, 61, 107, 0.12);
-    border-color: var(--line);
-  }
-
-  .home-screen .service-icon-circle {
-    width: 80px;
-    height: 80px;
-  }
-
-  .home-screen .service-grid button {
-    font-size: 18px;
-  }
-
-  /* AI Planner Section - Two column layout */
-  .home-screen .AI-Plan_section {
-    margin-top: 64px;
-    margin-bottom: 64px;
-  }
-
-  .home-screen .AI-Plan_section .section-title {
-    font-size: 32px;
-    text-align: left;
-    margin-bottom: 24px;
-  }
-
-  .home-screen .AI-Plan_planner-card {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: auto auto auto auto;
-    gap: 0 48px;
-    height: auto;
-    min-height: 280px;
-    padding: 40px 48px;
-    text-align: left;
-    align-items: start;
-    border-radius: 24px;
-    background: linear-gradient(135deg, rgba(0, 94, 160, 0.95) 0%, rgba(46, 127, 240, 0.9) 100%);
-  }
-
-  .home-screen .AI-Plan_planner-header {
-    grid-column: 1;
-    grid-row: 1;
-    justify-content: flex-start;
-    margin-top: 0;
-    margin-bottom: 12px;
-  }
-
-  .home-screen .AI-Plan_planner-header svg path {
-    stroke: #ffffff;
-  }
-
-  .home-screen .AI-Plan_planner-card h4 {
-    color: #ffffff;
-    font-size: 28px;
-  }
-
-  .home-screen .AI-Plan_planner-subtitle {
-    grid-column: 1;
-    grid-row: 2;
-    color: rgba(255, 255, 255, 0.8);
-    font-size: 16px;
-    max-width: 400px;
-  }
-
-  .home-screen .AI-Plan_gemini {
-    grid-column: 2;
-    grid-row: 1 / 3;
-    margin-top: 0;
-    max-width: 100%;
-    align-self: center;
-  }
-
-  .home-screen .AI-Plan_planner-card .primary-btn {
-    grid-column: 2;
-    grid-row: 3;
-    justify-self: end;
-    margin-top: 16px;
-    margin-bottom: 0;
-    background: #ffffff;
-  }
-
-  .home-screen .AI-Plan_planner-card .primary-btn span {
-    color: #005ea0;
-  }
-
-  /* Code of Conduct - Two column grid */
-  .home-screen .stack-section:has(.conduct-head) {
-    margin-bottom: 64px;
-  }
-
-  .home-screen .conduct-head {
-    font-size: 32px;
-    text-align: left;
-    margin-bottom: 24px;
-    margin-top: 32px;
-  }
-
-  .home-screen .conduct-list {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px 48px;
-    padding: 0;
-    max-width: 100%;
-    list-style: none;
-    counter-reset: conduct-counter;
-  }
-
-  .home-screen .conduct-list li {
-    display: flex;
-    align-items: flex-start;
-    gap: 16px;
-    text-align: left;
-    font-size: 15px;
-    line-height: 1.6;
-    counter-increment: conduct-counter;
-  }
-
-  .home-screen .conduct-list li::before {
-    content: counter(conduct-counter, decimal-leading-zero);
-    flex-shrink: 0;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background: rgba(46, 146, 241, 0.1);
-    color: #2E92F1;
-    font-weight: 800;
-    font-size: 14px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .home-screen .conduct-list li::marker {
-    content: '';
-  }
-
-  /* Footer */
-  .home-screen .screen-footer {
-    margin-top: 64px;
-    text-align: center;
-  }
-
-  .home-screen .screen-footer img {
-    margin: 0 auto;
-  }
-
-  /* Hide bottom nav on desktop */
-  .home-screen ~ .bottom-nav,
-  .home-screen .bottom-nav {
-    display: none;
-  }
-}
-
-/* Larger desktop screens */
-@media (min-width: 1200px) {
-  .home-screen.screen {
-    max-width: 1600px;
-    padding: 40px 64px 120px;
-  }
-
-  .home-screen .top-section {
-    grid-template-columns: 1fr minmax(500px, 700px) 1fr;
-  }
-
-  .home-screen .stack-section:has(.ilp-glow-wrapper) {
-    max-width: 900px;
-  }
-
-  .home-screen .featured_des_horizontal-cards {
-    gap: 28px;
-  }
-
-  .home-screen .featured_des_place-card {
-    min-height: 340px;
-  }
-
-  .home-screen .featured_des_place-image {
-    height: 200px;
-  }
-
-  .home-screen .AI-Plan_planner-card {
-    padding: 48px 64px;
-    min-height: 320px;
-  }
-}
-
-/* Extra large screens */
-@media (min-width: 1400px) {
-  .home-screen.screen {
-    max-width: 1800px;
-    padding: 48px 80px 120px;
-  }
-
-  .home-screen .featured_des_horizontal-cards {
-    grid-template-columns: repeat(4, 1fr);
-    gap: 32px;
-  }
-
-  .home-screen .featured_des_place-card {
-    min-height: 360px;
-  }
-
-  .home-screen .featured_des_place-image {
-    height: 220px;
-  }
-
 
 /* ILP Admin theme bridge and sidebar brand alignment */
 .admin-page {
@@ -10303,23 +9965,185 @@ body {
 .admin-page .ilp-admin-doc-item a:hover {
   text-decoration: underline;
 }
-  .home-screen .service-grid {
-    max-width: 1100px;
-    gap: 40px;
-  }
 
-  .home-screen .service-grid button {
-    padding: 40px 32px;
-  }
+/* Cabs approvals panel */
+.admin-cabs-manager {
+  display: grid;
+  gap: 18px;
+}
 
-  .home-screen .service-icon-circle {
-    width: 96px;
-    height: 96px;
-  }
+.admin-cabs-loading {
+  margin: 0;
+  padding: 24px;
+  border-radius: 14px;
+  border: 1px solid var(--admin-border);
+  background: var(--admin-surface);
+  color: var(--admin-text-muted);
+  font-weight: 600;
+}
 
-  .home-screen .conduct-list {
-    gap: 20px 64px;
-  }
+.admin-cabs-table-wrap {
+  border-radius: 16px;
+  border: 1px solid var(--admin-border);
+  background: var(--admin-surface);
+  overflow: hidden;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.08);
+}
+
+.admin-cabs-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.admin-cabs-table thead {
+  background: color-mix(in srgb, var(--admin-surface) 88%, var(--admin-accent) 12%);
+}
+
+.admin-cabs-table th,
+.admin-cabs-table td {
+  padding: 14px 16px;
+  text-align: left;
+  border-bottom: 1px solid var(--admin-border);
+  vertical-align: middle;
+}
+
+.admin-cabs-table th {
+  color: var(--admin-text-muted);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.admin-cabs-table tbody tr:hover {
+  background: color-mix(in srgb, var(--admin-surface) 84%, var(--admin-accent) 16%);
+}
+
+.admin-cabs-id {
+  color: var(--admin-text-muted);
+  font-weight: 700;
+}
+
+.admin-cabs-primary {
+  color: var(--admin-text);
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.admin-cabs-secondary {
+  color: var(--admin-text-muted);
+  font-size: 12px;
+  font-weight: 600;
+  margin-top: 3px;
+}
+
+.admin-cabs-mono {
+  color: var(--admin-text);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.admin-cabs-status {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.admin-cabs-status-approved {
+  background: rgba(22, 163, 74, 0.18);
+  color: #22c55e;
+}
+
+.admin-cabs-status-rejected {
+  background: rgba(239, 68, 68, 0.2);
+  color: #f87171;
+}
+
+.admin-cabs-status-pending {
+  background: rgba(245, 158, 11, 0.2);
+  color: #fbbf24;
+}
+
+.admin-cabs-cell-right {
+  text-align: right !important;
+  white-space: nowrap;
+}
+
+.admin-cabs-action {
+  border: 1px solid transparent;
+  border-radius: 8px;
+  padding: 7px 11px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  margin-left: 8px;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.admin-cabs-action-approve {
+  border-color: rgba(34, 197, 94, 0.35);
+  background: rgba(22, 163, 74, 0.16);
+  color: #22c55e;
+}
+
+.admin-cabs-action-approve:hover {
+  background: rgba(22, 163, 74, 0.24);
+}
+
+.admin-cabs-action-reject {
+  border-color: rgba(248, 113, 113, 0.35);
+  background: rgba(239, 68, 68, 0.18);
+  color: #f87171;
+}
+
+.admin-cabs-action-reject:hover {
+  background: rgba(239, 68, 68, 0.26);
+}
+
+.admin-cabs-empty {
+  text-align: center !important;
+  padding: 36px !important;
+  color: var(--admin-text-muted);
+  font-weight: 600;
+}
+
+.admin-theme-light .admin-cabs-table-wrap {
+  box-shadow: 0 10px 20px rgba(15, 23, 42, 0.06);
+}
+
+.admin-theme-light .admin-cabs-status-approved {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.admin-theme-light .admin-cabs-status-rejected {
+  background: #ffe4e6;
+  color: #be123c;
+}
+
+.admin-theme-light .admin-cabs-status-pending {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.admin-theme-light .admin-cabs-action-approve {
+  border-color: #86efac;
+  background: #dcfce7;
+  color: #166534;
+}
+
+.admin-theme-light .admin-cabs-action-reject {
+  border-color: #fda4af;
+  background: #ffe4e6;
+  color: #9f1239;
 }
 
 
@@ -10417,4 +10241,524 @@ body {
 }
 .admin-sidebar:not(:hover) .admin-nav-label {
   display: none;
+}
+
+/* -----------------------------------------------------------------------
+   HOME PAGE — UI REPAIRED PARITY
+   ----------------------------------------------------------------------- */
+
+.home-screen .ilp-glow-wrapper::after {
+  content: none;
+}
+
+.home-screen .ilp-border::after {
+  content: none;
+}
+
+.home-screen .featured_des_place-card p {
+  font-size: 12px;
+}
+
+.home-screen .featured_des_card-foot button {
+  min-width: 160px;
+  height: 48px;
+  border: 2px solid #3095EC;
+  border-radius: 999px;
+  background: transparent;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 16px;
+  cursor: pointer;
+  color: #3095EC;
+  font-family: 'Karla', sans-serif;
+  font-size: 13px;
+  font-weight: 400;
+}
+
+.home-screen .featured_des_card-foot button svg {
+  width: 16px;
+  height: 16px;
+}
+
+@media (max-width: 991px) {
+  .home-screen .featured_des_place-card {
+    height: 257px;
+    min-height: 257px;
+  }
+
+  .home-screen .featured_des_place-image {
+    width: calc(100% - 8px);
+    height: 137px !important;
+    min-height: 137px;
+    max-height: 137px;
+    margin: 4px;
+    object-fit: cover;
+  }
+
+  .home-screen .featured_des_card-foot button {
+    width: 32px;
+    min-width: 32px;
+    height: 32px;
+    border: none;
+    border-radius: 50%;
+    background: #3095EC;
+    padding: 0;
+    gap: 0;
+    font-size: 0;
+  }
+
+  .home-screen .featured_des_card-foot button span {
+    display: none;
+  }
+
+  .home-screen .featured_des_card-foot button svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .home-screen .featured_des_card-foot button svg path {
+    stroke: #FFFFFF;
+  }
+}
+
+.home-mobile-only {
+  display: block;
+}
+
+.home-ilp-conduct-desktop {
+  display: none;
+}
+
+.home-screen .featured_des_card-foot small svg {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+@media (min-width: 992px) {
+  .home-screen {
+    padding: 0 0 108px;
+    min-height: 100vh;
+    overflow: visible;
+    background: #dfe2ea;
+  }
+
+  .home-screen > * {
+    width: min(1280px, 100%);
+    margin: 0 auto 40px !important;
+    padding: 0 28px !important;
+    display: block !important;
+  }
+
+  .home-hero-top {
+    min-height: 360px;
+    margin-top: 104px !important;
+    padding-top: 8px !important;
+    margin-bottom: 20px !important;
+  }
+
+  .home-hero-top .brand-wrap {
+    display: block;
+    margin: 0 auto;
+  }
+
+  .home-hero-top .search-row {
+    width: min(640px, 100%);
+    margin-top: 18px;
+    background: #ececec;
+    border: none;
+    box-shadow: none;
+    min-height: 52px;
+    border-radius: 12px;
+  }
+
+  .home-hero-top .search-row:focus-within {
+    box-shadow: 0 0 0 2px rgba(48, 149, 236, 0.2);
+  }
+
+  .home-mobile-only {
+    display: none;
+  }
+
+  .home-ilp-conduct-desktop {
+    display: block !important;
+    min-height: auto !important;
+    padding: 0 34px !important;
+    margin-bottom: 36px !important;
+  }
+
+  .home-ilp-desktop-card-wrap {
+    width: min(100%, 1080px);
+    margin: 0 auto;
+  }
+
+  .home-ilp-section-desktop-only {
+    background: linear-gradient(135deg, #35a0e9 0%, #3e75df 100%);
+    border-radius: 14px;
+    padding: 22px 26px 22px;
+    min-height: 196px;
+    color: #f2f6ff;
+  }
+
+  .home-ilp-card-desktop {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .home-ilp-topline {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 40px;
+    margin: 0;
+  }
+
+  .home-ilp-right-title {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 500;
+    color: rgba(241, 246, 255, 0.95);
+    position: relative;
+    top: -8px;
+  }
+
+  .home-ilp-section .mandatory-badge {
+    margin: 0;
+    align-self: flex-start;
+    padding: 4px 14px;
+    font-size: 11px;
+    font-weight: 700;
+    height: auto;
+    border-color: rgba(255, 255, 255, 0.88);
+    color: #f8fbff;
+    background: transparent;
+    gap: 6px;
+    line-height: 1;
+  }
+
+  .home-ilp-section .mandatory-badge img {
+    width: 14px;
+    height: 14px;
+    display: block;
+  }
+
+  .home-ilp-title {
+    margin: 0;
+    font-size: 46px;
+    line-height: 1.02;
+    letter-spacing: -0.8px;
+    color: #edf2ff;
+    font-weight: 700;
+  }
+
+  .home-ilp-desc {
+    max-width: 500px;
+    font-size: 16px;
+    line-height: 1.16;
+    color: rgba(243, 247, 255, 0.95);
+    margin: -6px 0 0;
+    font-weight: 500;
+  }
+
+  .home-ilp-action {
+    margin-top: 8px;
+    margin-left: auto;
+    align-self: flex-end;
+    min-width: 150px;
+    height: 38px;
+    border-radius: 999px;
+    background: #ececec;
+    color: #222;
+    font-size: 12px;
+    font-weight: 600;
+    position: static;
+    padding: 0 22px;
+    box-shadow: none;
+    gap: 6px;
+  }
+
+  .home-ilp-action:hover {
+    transform: none;
+    background: #ececec;
+  }
+
+  .home-ilp-action img {
+    width: 11px;
+    height: 11px;
+    display: block;
+  }
+
+  .home-screen .stack-section {
+    min-height: auto !important;
+    display: block !important;
+    align-items: initial !important;
+    justify-content: initial !important;
+    padding: 0 34px !important;
+    margin: 0 auto 48px !important;
+  }
+
+  .home-screen .stack-section .section-title {
+    text-align: center;
+    font-size: 38px;
+    margin-bottom: 16px;
+    color: #212121;
+    letter-spacing: -0.8px;
+  }
+
+  .home-featured-section .section-title {
+    display: none;
+  }
+
+  .home-ilp-section-mobile .section-title {
+    font-family: inherit;
+    display: block;
+    text-align: center;
+  }
+
+  .home-ilp-section-mobile .section-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .home-ilp-section-mobile .home-ilp-topline {
+    position: absolute;
+    top: 32px;
+    left: 48px;
+    right: 48px;
+    justify-content: space-between;
+    gap: 24px;
+    align-items: center;
+    margin-bottom: 0;
+  }
+
+  .home-ilp-section-mobile .ilp-card-blue {
+    height: 328px;
+    margin: 0 48px;
+  }
+
+  .home-ilp-section-mobile .ilp-card-blue h4 {
+    margin-top: 112px;
+  }
+
+  .home-ilp-section-mobile .ilp-card-blue p {
+    margin-top: 0;
+  }
+
+  .home-ilp-section-mobile .mandatory-badge {
+    position: static;
+    margin-bottom: 0;
+    margin-top: 0;
+    width: auto;
+    align-self: flex-start;
+  }
+
+  .home-ilp-section-mobile .home-ilp-right-title {
+    position: relative;
+    top: -2px;
+    margin: 0;
+    text-align: right;
+    line-height: 1;
+    font-size: 16px;
+    letter-spacing: -0.5px;
+    color: rgba(255, 255, 255, 1);
+  }
+
+  .home-ilp-section-mobile .ilp-card-blue h4 {
+    position: static;
+    top: auto;
+  }
+
+  .home-ilp-section-mobile .ilp-card-blue p {
+    position: static;
+    top: auto;
+  }
+
+  .home-ilp-section-mobile {
+    margin-bottom: 112px !important;
+  }
+
+  .home-screen .featured_des_horizontal-cards {
+    display: grid !important;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 8px;
+    width: 100%;
+    max-width: 100%;
+    margin: 0 auto;
+  }
+
+  .home-screen .featured_des_place-card {
+    border: 1px solid #d7dfeb;
+    border-radius: 10px;
+    min-height: 390px;
+    height: 390px;
+    background: #f5f7fb;
+    display: flex;
+    flex-direction: column;
+    transition: none;
+  }
+
+  .home-screen .featured_des_place-card:hover {
+    transform: none;
+    box-shadow: none;
+  }
+
+  .home-screen .featured_des_place-image {
+    width: calc(100% - 8px);
+    height: 210px;
+    margin: 4px 4px 0;
+    border-radius: 7px;
+  }
+
+  .home-screen .featured_des_place-card h4 {
+    font-size: 24px;
+    font-weight: 700;
+    margin: 16px 8px 0;
+    letter-spacing: -1px;
+  }
+
+  .home-screen .featured_des_place-card p {
+    font-size: 13px;
+    font-weight: 400;
+    margin: 8px 8px 0;
+    line-height: 1.25;
+    color: rgba(30, 30, 30, 0.72);
+    letter-spacing: -1px;
+  }
+
+  .home-screen .featured_des_card-foot {
+    margin: 8px 8px 8px;
+    margin-top: auto;
+  }
+
+  .home-screen .featured_des_card-foot small {
+    font-size: 12px;
+    color: #6e7684;
+    gap: 8px;
+    letter-spacing: -1px;
+  }
+
+  .home-screen .featured_des_card-foot small svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  .home-screen .featured_des_card-foot button,
+  .home-screen .featured_des_card-foot button * {
+    letter-spacing: -1px;
+  }
+
+  .home-screen .featured_des_card-foot button {
+    min-width: 126px;
+    height: 40px;
+    border: 2px solid #3095EC;
+    border-radius: 999px;
+    background: transparent;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 0 16px;
+    color: #3095EC;
+    font-family: 'Karla', sans-serif;
+    font-size: 10px;
+    font-weight: 400;
+  }
+
+  .home-screen .featured_des_card-foot button svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .home-featured-actions {
+    display: none !important;
+  }
+
+  .home-services-section {
+    margin-top: 10px !important;
+  }
+
+  .home-services-section .section-title {
+    display: none;
+  }
+
+  .home-screen .service-grid {
+    display: inline-flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+    gap: 34px;
+    width: auto;
+    vertical-align: top;
+    margin-top: 2px;
+  }
+
+  .home-screen .service-grid button {
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    padding: 0;
+    gap: 7px;
+    font-size: 11px;
+    font-weight: 700;
+    width: auto;
+    min-width: 0;
+  }
+
+  .home-screen .service-grid button:hover {
+    transform: none;
+    box-shadow: none;
+  }
+
+  .home-screen .service-icon-circle {
+    width: 64px;
+    height: 64px;
+  }
+
+  .home-screen .AI-Plan_section {
+    margin: 0 auto 0 !important;
+  }
+
+  .home-screen .AI-Plan_section .section-title {
+    display: none;
+  }
+
+  .home-screen .AI-Plan_planner-card {
+    height: auto;
+    justify-content: center;
+    padding: 44px 50px;
+    border-radius: 10px;
+    background: rgba(46, 157, 241, 0.12);
+    max-width: 100%;
+    margin: 0 auto;
+    min-height: 216px;
+  }
+
+  .home-screen .AI-Plan_planner-header {
+    margin: 0 0 18px;
+    justify-content: center;
+  }
+
+  .home-screen .AI-Plan_planner-card h4 {
+    font-size: 44px;
+    margin: 0;
+    color: #2f8ee7;
+  }
+
+  .home-screen .AI-Plan_planner-subtitle {
+    font-size: 15px;
+    margin-bottom: 0;
+    text-align: center;
+    color: rgba(30, 30, 30, 0.6);
+  }
+
+  .home-screen .AI-Plan_gemini,
+  .home-screen .AI-Plan_section .primary-btn,
+  .home-screen .screen-footer {
+    display: none;
+  }
 }
