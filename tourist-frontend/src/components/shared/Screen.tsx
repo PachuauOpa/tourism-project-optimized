@@ -35,7 +35,9 @@ export const Screen: React.FC<ScreenProps & NativeMainProps> = ({
         {...(shouldReduceMotion ? {} : pageMotion)}
         {...restProps}
       >
-        {children}
+        <div className="mx-auto w-full max-w-7xl px-4 md:px-8">
+          {children}
+        </div>
       </Motion.main>
     </div>
   );

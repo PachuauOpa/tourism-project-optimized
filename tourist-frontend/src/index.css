@@ -8493,7 +8493,7 @@ body {
 }
 
 @media (min-width: 992px) {
-  /* Show desktop sidebar */
+  /* Show desktop nav */
   .desktop-nav-wrapper {
     display: block;
   }
@@ -8502,19 +8502,21 @@ body {
     display: none;
   }
 
-  /* App layout becomes flex-row on desktop */
+  /* App layout becomes top-down */
   .app-layout {
-    flex-direction: row;
+    flex-direction: column;
   }
 
-  /* Main content shifts right of sidebar */
+  /* Main content spacing for top nav */
   .app-layout > main.screen {
-    margin-left: var(--sidebar-width, 260px);
-    transition: margin-left 0.3s ease;
+    margin-top: 72px;
+    margin-left: auto;
+    margin-right: auto;
+    width: 100%;
   }
 
   .app-layout--no-nav > main.screen {
-    margin-left: 0;
+    margin-top: 0;
   }
 }
 

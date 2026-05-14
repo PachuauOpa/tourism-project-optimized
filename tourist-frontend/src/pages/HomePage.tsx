@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Screen from '../components/shared/Screen';
 import AnimatedSection from '../components/shared/AnimatedSection';
-import HeaderLogo from '../components/shared/HeaderLogo';
 import BottomNav from '../components/shared/BottomNav';
 import SearchIcon from '../components/SearchIcon';
 import FilterIcon from '../components/FilterIcon';
@@ -165,8 +164,6 @@ const HomePage: React.FC = () => {
     <Screen className="home-screen">
       {/* ── Header / Brand ── */}
       <AnimatedSection delay={0.03} className="top-section home-hero-top">
-          <HeaderLogo />
-
           <form className="search-row" onSubmit={handleSearchSubmit}>
             <SearchIcon size={24} className="search-icon" />
             <input

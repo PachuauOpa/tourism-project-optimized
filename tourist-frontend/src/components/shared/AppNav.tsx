@@ -1,17 +1,17 @@
-import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useTheme } from '../../context/ThemeContext';
 
 /* ---------------------------------------------------------------
    AppNav — renders as:
-   • Desktop (≥992px): Fixed left sidebar with brand + nav links
-   • Mobile (<992px):  Fixed bottom pill navigation (existing design)
+   • Desktop (≥992px): Fixed top nav with brand + nav links + theme toggle
+   • Mobile (<992px):  Fixed bottom pill navigation
 --------------------------------------------------------------- */
 
 interface NavItem {
   to: string;
   label: string;
   icon: string;
-  activeIcon?: string;
   activeCondition?: (pathname: string) => boolean;
 }
 
@@ -46,251 +46,93 @@ const NAV_ITEMS: NavItem[] = [
   },
 ];
 
-// Module-level persisted indices — survive re-renders, preserve last position
-let desktopLastSelectedIndex = 0;
-let mobileLastSelectedIndex = 0;
-
 const getActiveNavIndex = (pathname: string): number => (
   NAV_ITEMS.findIndex((item) => (
     item.activeCondition ? item.activeCondition(pathname) : pathname === item.to
   ))
 );
 
-/** Compute the CSS highlight position from a link element and its nav container. */
-const computeDesktopHighlight = (
-  linkEl: HTMLAnchorElement | null,
-): React.CSSProperties => {
-  if (!linkEl) return {};
-  return {
-    transform: `translate3d(${linkEl.offsetLeft}px, ${linkEl.offsetTop}px, 0)`,
-    width: `${linkEl.offsetWidth}px`,
-    height: `${linkEl.offsetHeight}px`,
-    willChange: 'transform, width, height',
-  };
-};
-
-const computeMobileHighlight = (
-  linkEl: HTMLAnchorElement | null,
-): React.CSSProperties => {
-  if (!linkEl) return {};
-  return {
-    transform: `translate3d(${linkEl.offsetLeft}px, 0, 0)`,
-    width: `${linkEl.offsetWidth}px`,
-    height: `${linkEl.offsetHeight}px`,
-    willChange: 'transform, width',
-  };
-};
-
-// ───────────────────────────────────────────────
-// Desktop Sidebar
-// ───────────────────────────────────────────────
-const DesktopSidebar: React.FC = () => {
-  const location = useLocation();
-  const navigate = useNavigate();
-  const [collapsed, setCollapsed] = useState(false);
-  const navRef = useRef<HTMLElement | null>(null);
-  const linkRefs = useRef<Array<HTMLAnchorElement | null>>([]);
-
-  const activeIndex = getActiveNavIndex(location.pathname);
-
-  // highlightIndex tracks the visually highlighted item — persists across nav to avoid flash
-  const [highlightIndex, setHighlightIndex] = useState<number>(() => {
-    const idx = activeIndex >= 0 ? activeIndex : desktopLastSelectedIndex;
-    return idx;
-  });
-
-  const effectiveActiveIndex = activeIndex >= 0 ? activeIndex : highlightIndex;
-
-  // Compute style directly from DOM without async delay
-  const [highlightStyle, setHighlightStyle] = useState<React.CSSProperties>({});
-
-  const updateHighlight = useCallback((index: number = highlightIndex) => {
-    const activeLink = linkRefs.current[index] ?? null;
-    if (!activeLink) return;
-    setHighlightStyle(computeDesktopHighlight(activeLink));
-  }, [highlightIndex]);
-
-  // Sync index immediately (no rAF) so highlight moves the same frame the route changes
-  useLayoutEffect(() => {
-    if (activeIndex >= 0 && activeIndex !== highlightIndex) {
-      setHighlightIndex(activeIndex);
-      desktopLastSelectedIndex = activeIndex;
-    }
-  }, [activeIndex]); // intentionally NOT depending on highlightIndex to avoid loop
-
-  // Recompute position whenever index or collapsed state changes
-  useLayoutEffect(() => {
-    updateHighlight(highlightIndex);
-  }, [highlightIndex, collapsed]);
-
-  // Also update on resize / sidebar dimension changes
-  useLayoutEffect(() => {
-    const handleResize = () => updateHighlight(highlightIndex);
-    window.addEventListener('resize', handleResize);
-
-    let observer: ResizeObserver | null = null;
-    if (typeof ResizeObserver !== 'undefined') {
-      observer = new ResizeObserver(() => updateHighlight(highlightIndex));
-      if (navRef.current) observer.observe(navRef.current);
-      const activeLink = linkRefs.current[highlightIndex];
-      if (activeLink) observer.observe(activeLink);
-    }
-
-    return () => {
-      window.removeEventListener('resize', handleResize);
-      observer?.disconnect();
-    };
-  }, [highlightIndex, updateHighlight]);
-
-  // Persist on unmount
-  useEffect(() => () => {
-    if (activeIndex >= 0) desktopLastSelectedIndex = activeIndex;
-  }, [activeIndex]);
-
+const DesktopNav: React.FC<{ activeIndex: number; theme: string; toggleTheme: () => void; navigate: ReturnType<typeof useNavigate> }> = ({ activeIndex, theme, toggleTheme, navigate }) => {
   return (
-    <aside
-      className={`desktop-sidebar ${collapsed ? 'desktop-sidebar--collapsed' : ''}`}
-      aria-label="Main Navigation"
-    >
+    <header className="sticky top-0 z-50 flex items-center justify-between px-6 py-4 bg-white dark:bg-slate-900 border-b border-line dark:border-gray-800 shadow-sm" aria-label="Main Navigation">
       {/* Brand */}
-      <div className="sidebar-brand" onClick={() => navigate('/home')} role="button" tabIndex={0} aria-label="Go home">
-        <img src="/icons/title-mark.svg" alt="Tourism Project" className="sidebar-brand-mark" width="38" height="85" />
-        {!collapsed && (
-          <div className="sidebar-brand-text" aria-hidden="true">
-            <span>TOURISM</span>
-            <span>PROJECT</span>
-          </div>
-        )}
+      <div 
+        className="flex items-center gap-2 cursor-pointer" 
+        onClick={() => navigate('/home')} 
+        role="button" 
+        tabIndex={0} 
+        aria-label="Go home"
+      >
+        <img src="/icons/title-mark.svg" alt="Tourism Project" className="w-[30px] h-auto" width="30" height="auto" />
+        <div className="flex flex-col font-bold leading-none tracking-tight text-ink dark:text-white" aria-hidden="true" style={{ fontSize: '18px' }}>
+          <span>TOURISM</span>
+          <span>PROJECT</span>
+        </div>
       </div>
 
       {/* Nav Links */}
-      <nav className="sidebar-nav" aria-label="Site navigation" ref={navRef}>
-        <span className="sidebar-nav-highlight" style={highlightStyle} aria-hidden="true" />
+      <nav className="flex items-center gap-6" aria-label="Site navigation">
         {NAV_ITEMS.map((item, index) => {
-          const isActive = index === effectiveActiveIndex;
+          const isActive = index === activeIndex;
 
           return (
             <Link
               key={item.to}
               to={item.to}
-              ref={(element) => {
-                linkRefs.current[index] = element;
-              }}
-              className={`sidebar-nav-link ${isActive ? 'sidebar-nav-link--active' : ''}`}
+              className={`flex items-center gap-2 px-4 py-2 rounded-full transition-colors ${
+                isActive 
+                  ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 font-bold' 
+                  : 'text-muted dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 font-medium'
+              }`}
               aria-label={item.label}
               aria-current={isActive ? 'page' : undefined}
             >
-              <span className="sidebar-nav-icon">
-                <img src={item.icon} alt={item.label} width="20" height="20" />
-              </span>
-              {!collapsed && <span className="sidebar-nav-label">{item.label}</span>}
+              <img 
+                src={item.icon} 
+                alt={item.label} 
+                width="20" 
+                height="20" 
+                style={{ filter: isActive ? 'none' : 'grayscale(100%) opacity(70%)' }}
+              />
+              <span>{item.label}</span>
             </Link>
           );
         })}
       </nav>
 
-      {/* Collapse toggle */}
+      {/* Theme toggle */}
       <button
-        type="button"
-        className="sidebar-collapse-btn"
-        onClick={() => setCollapsed((prev) => !prev)}
-        aria-label={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-        title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+        onClick={toggleTheme}
+        className="admin-theme-toggle flex items-center justify-center p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-800 transition text-ink dark:text-white"
+        aria-label="Toggle theme"
       >
-        <span className="sidebar-collapse-icon">{collapsed ? '›' : '‹'}</span>
-        {!collapsed && <span className="sidebar-collapse-label">Collapse</span>}
+        {theme === 'dark' ? (
+           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-yellow-400"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+        ) : (
+           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-gray-800"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+        )}
       </button>
-
-      {/* Footer */}
-      {!collapsed && (
-        <div className="sidebar-footer">
-          <img src="/icons/lushai-tech.svg" alt="LushAI Tech" width="121" height="32" loading="lazy" decoding="async" />
-        </div>
-      )}
-    </aside>
+    </header>
   );
 };
 
-// ───────────────────────────────────────────────
-// Mobile Bottom Nav (existing design, preserved)
-// ───────────────────────────────────────────────
-const MobileBottomNav: React.FC = () => {
-  const location = useLocation();
-  const navRef = useRef<HTMLElement | null>(null);
-  const linkRefs = useRef<Array<HTMLAnchorElement | null>>([]);
-
-  const activeIndex = getActiveNavIndex(location.pathname);
-
-  // Initialize from persisted index to avoid flash on mount
-  const [highlightIndex, setHighlightIndex] = useState<number>(() => {
-    return activeIndex >= 0 ? activeIndex : mobileLastSelectedIndex;
-  });
-
-  const effectiveActiveIndex = activeIndex >= 0 ? activeIndex : highlightIndex;
-
-  const [highlightStyle, setHighlightStyle] = useState<React.CSSProperties>({});
-
-  const updateHighlight = useCallback((index: number = highlightIndex) => {
-    const activeLink = linkRefs.current[index] ?? null;
-    if (!activeLink) return;
-    setHighlightStyle(computeMobileHighlight(activeLink));
-  }, [highlightIndex]);
-
-  // Sync index immediately (no rAF) — same frame as route change
-  useLayoutEffect(() => {
-    if (activeIndex >= 0 && activeIndex !== highlightIndex) {
-      setHighlightIndex(activeIndex);
-      mobileLastSelectedIndex = activeIndex;
-    }
-  }, [activeIndex]); // intentionally NOT including highlightIndex
-
-  // Recompute position whenever index changes
-  useLayoutEffect(() => {
-    updateHighlight(highlightIndex);
-  }, [highlightIndex]);
-
-  // Handle resize
-  useLayoutEffect(() => {
-    const handleResize = () => updateHighlight(highlightIndex);
-    window.addEventListener('resize', handleResize);
-
-    let observer: ResizeObserver | null = null;
-    if (typeof ResizeObserver !== 'undefined') {
-      observer = new ResizeObserver(() => updateHighlight(highlightIndex));
-      if (navRef.current) observer.observe(navRef.current);
-      const activeLink = linkRefs.current[highlightIndex];
-      if (activeLink) observer.observe(activeLink);
-    }
-
-    return () => {
-      window.removeEventListener('resize', handleResize);
-      observer?.disconnect();
-    };
-  }, [highlightIndex, updateHighlight]);
-
-  // Persist on unmount
-  useEffect(() => () => {
-    if (activeIndex >= 0) mobileLastSelectedIndex = activeIndex;
-  }, [activeIndex]);
-
+const MobileBottomNav: React.FC<{ activeIndex: number }> = ({ activeIndex }) => {
   return (
-    <nav className="bottom-nav" aria-label="Mobile navigation" ref={navRef}>
-      <span className="bottom-nav-highlight" style={highlightStyle} aria-hidden="true" />
+    <nav className="bottom-nav border-t border-line dark:border-gray-800 bg-white dark:bg-[#131313] fixed bottom-0 w-full flex justify-around items-center h-[72px] z-[100]" aria-label="Mobile navigation">
       {NAV_ITEMS.map((item, index) => {
-        const isActive = index === effectiveActiveIndex;
+        const isActive = index === activeIndex;
 
         return (
           <Link
             key={item.to}
             to={item.to}
-            ref={(element) => {
-              linkRefs.current[index] = element;
-            }}
-            className={`nav-link ${isActive ? 'active' : ''}`}
+            className={`nav-link flex-1 flex justify-center py-3 ${isActive ? 'active' : ''}`}
             aria-label={item.label}
             aria-current={isActive ? 'page' : undefined}
           >
-            <img src={item.icon} alt={item.label} width="20" height="20" />
+            <div className={`p-2 rounded-2xl ${isActive ? 'bg-blue-50 dark:bg-blue-900/30' : ''}`}>
+              <img src={item.icon} alt={item.label} width="24" height="24" style={{ filter: isActive ? 'none' : 'grayscale(100%) opacity(70%)' }} />
+            </div>
           </Link>
         );
       })}
@@ -298,19 +140,20 @@ const MobileBottomNav: React.FC = () => {
   );
 };
 
-// ───────────────────────────────────────────────
-// Combined AppNav — uses CSS to show correct nav per breakpoint
-// ───────────────────────────────────────────────
 export const AppNav: React.FC = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { theme, toggleTheme } = useTheme();
+
+  const activeIndex = getActiveNavIndex(location.pathname);
+
   return (
     <>
-      {/* Desktop sidebar — hidden on mobile via CSS */}
-      <div className="desktop-nav-wrapper">
-        <DesktopSidebar />
+      <div className="hidden md:block">
+        <DesktopNav activeIndex={activeIndex} theme={theme} toggleTheme={toggleTheme} navigate={navigate} />
       </div>
-      {/* Mobile bottom nav — hidden on desktop via CSS */}
-      <div className="mobile-nav-wrapper">
-        <MobileBottomNav />
+      <div className="block md:hidden">
+        <MobileBottomNav activeIndex={activeIndex} />
       </div>
     </>
   );
