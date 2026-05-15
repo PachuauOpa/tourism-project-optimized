@@ -1758,21 +1758,26 @@ registerDestinationRoutes(app, {
 
 app.use('/api/vehicles', vehicleRoutes);
 
+const startServer = () => {
+  app.listen(port, () => {
+    console.log(`ILP backend listening on port ${port}`);
+    if (RAZORPAY_CONFIGURED) {
+      console.log(`[Razorpay] ✅ Payment gateway configured (key: ${RAZORPAY_KEY_ID})`);
+    } else {
+      console.warn('[Razorpay] ⚠️  Payment gateway is misconfigured. Payment endpoints will return 503.');
+      for (const issue of RAZORPAY_CONFIG_ISSUES) {
+        console.warn(`[Razorpay] - ${issue}`);
+      }
+    }
+  });
+};
+
 initializeDatabase()
   .then(() => {
-    app.listen(port, () => {
-      console.log(`ILP backend listening on port ${port}`);
-      if (RAZORPAY_CONFIGURED) {
-        console.log(`[Razorpay] ✅ Payment gateway configured (key: ${RAZORPAY_KEY_ID})`);
-      } else {
-        console.warn('[Razorpay] ⚠️  Payment gateway is misconfigured. Payment endpoints will return 503.');
-        for (const issue of RAZORPAY_CONFIG_ISSUES) {
-          console.warn(`[Razorpay] - ${issue}`);
-        }
-      }
-    });
+    startServer();
   })
   .catch((error) => {
-    console.error('Database initialization failed:', error);
-    process.exit(1);
+    console.error('Database initialization failed (continuing without DB):', error);
+    console.warn('Starting server without database. Some endpoints will be unavailable.');
+    startServer();
   });

@@ -730,6 +730,37 @@ select {
   padding-top: 24px;
 }
 
+.home-hero-shell {
+  width: 100%;
+  border-radius: 36px;
+  background: transparent;
+  padding: 40px 18px 20px;
+  min-height: 300px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 28px;
+  box-shadow: none;
+}
+
+.home-hero-shell .brand-wrap {
+  margin: 0;
+}
+
+.home-hero-shell .brand-logo-row {
+  justify-content: center;
+}
+
+.home-hero-shell .brand-logo-text span {
+  color: #24262d;
+}
+
+.home-hero-shell .brand-tagline {
+  color: rgba(30, 30, 30, 0.65);
+  margin-top: 20px;
+}
+
 /* Consistent spacing between major sections */
 .screen > .stack-section:first-of-type {
   margin-top: 32px;
@@ -742,6 +773,11 @@ select {
 .top-section {
   margin-top: 48px;
   margin-bottom: 48px;
+}
+
+.home-hero-top {
+  margin-top: 0;
+  margin-bottom: 28px;
 }
 
 .search-row {
@@ -8796,6 +8832,51 @@ body {
   .screen.plain-screen {
     max-width: 1400px;
     width: 100%;
+  }
+
+  .home-hero-shell {
+    min-height: 420px;
+    padding: 56px 32px 28px;
+    border-radius: 0 0 40px 40px;
+    gap: 34px;
+  }
+
+  .home-hero-shell .brand-logo-mark {
+    width: 52px;
+    height: 116px;
+  }
+
+  .home-hero-shell .brand-logo-text span {
+    font-size: 36px;
+    letter-spacing: -2.6px;
+  }
+
+  .home-hero-shell .brand-tagline {
+    font-size: 20px;
+    margin-top: 28px;
+  }
+
+  .home-hero-shell .search-row {
+    width: min(720px, 100%);
+    margin-top: 0;
+    min-height: 72px;
+    border-radius: 20px;
+    background: #ffffff;
+  }
+
+  .home-hero-shell .search-row input {
+    font-size: 18px;
+  }
+
+  .home-hero-shell .search-icon {
+    width: 28px;
+    height: 28px;
+  }
+
+  .home-hero-shell .filter-chip {
+    width: 56px;
+    height: 48px;
+    border-radius: 18px;
   }
 }
 

@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import Screen from '../components/shared/Screen';
 import AnimatedSection from '../components/shared/AnimatedSection';
 import BottomNav from '../components/shared/BottomNav';
+import HeaderLogo from '../components/shared/HeaderLogo';
 import SearchIcon from '../components/SearchIcon';
 import FilterIcon from '../components/FilterIcon';
 import FilterDropdown from '../components/FilterDropdown';
@@ -162,8 +163,10 @@ const HomePage: React.FC = () => {
 
   return (
     <Screen className="home-screen">
-      {/* ── Header / Brand ── */}
+      {/* ── Hero / Brand ── */}
       <AnimatedSection delay={0.03} className="top-section home-hero-top">
+        <div className="home-hero-shell">
+          <HeaderLogo />
           <form className="search-row" onSubmit={handleSearchSubmit}>
             <SearchIcon size={24} className="search-icon" />
             <input
@@ -181,6 +184,7 @@ const HomePage: React.FC = () => {
               onApplyFilters={handleFilterApply}
             />
           </form>
+        </div>
         </AnimatedSection>
 
       {/* ── Entry Requirement ── */}
