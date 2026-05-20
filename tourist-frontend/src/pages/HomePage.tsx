@@ -29,6 +29,36 @@ const FeaturedLocationIcon: React.FC = () => (
   </svg>
 );
 
+/* ── Static weather data (demo) ── */
+const DEMO_WEATHER = {
+  location: 'Aizawl, Mizoram',
+  description: 'Partly Cloudy',
+  temp: 22,
+  feelsLike: 21,
+  high: 24,
+  low: 18,
+  wind: 8,
+  travelStatus: 'Good for travel',
+};
+
+/* ── Explore categories ── */
+interface ExploreCategory {
+  id: string;
+  label: string;
+  emoji: string;
+  route: string;
+}
+
+const EXPLORE_CATEGORIES: ExploreCategory[] = [
+  { id: 'plan', label: 'Plan Trip', emoji: '✨', route: '/planner' },
+  { id: 'homestay', label: 'Homestay', emoji: '🏠', route: '/service/hotel-stays' },
+  { id: 'transport', label: 'Transport', emoji: '🚗', route: '/service/cabs' },
+  { id: 'guides', label: 'Guides', emoji: '🎫', route: '/search?query=guides' },
+  { id: 'events', label: 'Events', emoji: '📅', route: '/search?query=events' },
+  { id: 'food', label: 'Food', emoji: '🍴', route: '/search?query=food' },
+  { id: 'bookings', label: 'Bookings', emoji: '💳', route: '/search?query=bookings' },
+];
+
 const HomePage: React.FC = () => {
   const navigate = useNavigate();
   const [searchValue, setSearchValue] = useState<string>('');
@@ -126,7 +156,7 @@ const HomePage: React.FC = () => {
   const formatDistanceLabel = (text: string): string => {
     return text
       .replace(/\s*from your location/gi, '')
-      .replace(/\s*(--|—|–|-)\s*$/g, '')
+      .replace(/\s*(--|—|–|-)\\s*$/g, '')
       .trim();
   };
 
@@ -187,8 +217,54 @@ const HomePage: React.FC = () => {
         </div>
         </AnimatedSection>
 
+      {/* ── Weather Card Widget ── */}
+      <AnimatedSection delay={0.05} className="stack-section">
+        <div className="weather-card">
+          <div className="weather-card-top">
+            <div className="weather-location">
+              <svg width="14" height="17" viewBox="0 0 14 17" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                <path d="M7 0.5C3.41 0.5 0.5 3.41 0.5 7C0.5 11.75 7 16.5 7 16.5C7 16.5 13.5 11.75 13.5 7C13.5 3.41 10.59 0.5 7 0.5Z" fill="rgba(255,255,255,0.3)"/>
+                <circle cx="7" cy="7" r="2.5" fill="rgba(255,255,255,0.6)"/>
+              </svg>
+              <span>{DEMO_WEATHER.location}</span>
+            </div>
+            <span className="weather-desc">{DEMO_WEATHER.description}</span>
+          </div>
+          <div className="weather-temp-row">
+            <span className="weather-temp">{DEMO_WEATHER.temp}°C</span>
+            <span className="weather-feels">Feels like {DEMO_WEATHER.feelsLike}°C</span>
+          </div>
+          <div className="weather-pills">
+            <span className="weather-pill weather-pill-travel">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><circle cx="6" cy="6" r="5" stroke="currentColor" strokeWidth="1.5"/><path d="M4 6L5.5 7.5L8 4.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+              {DEMO_WEATHER.travelStatus}
+            </span>
+            <span className="weather-pill">↑{DEMO_WEATHER.high}° ↓{DEMO_WEATHER.low}°</span>
+            <span className="weather-pill">Wind {DEMO_WEATHER.wind} km/h</span>
+          </div>
+        </div>
+      </AnimatedSection>
+
+      {/* ── Explore Categories ── */}
+      <AnimatedSection delay={0.07} className="stack-section">
+        <h3 className="section-title">Explore</h3>
+        <div className="explore-row">
+          {EXPLORE_CATEGORIES.map((cat) => (
+            <button
+              key={cat.id}
+              type="button"
+              className={`explore-card ${cat.id === 'plan' ? 'explore-card-highlight' : ''}`}
+              onClick={() => navigate(cat.route)}
+            >
+              <span className="explore-emoji">{cat.emoji}</span>
+              <span className="explore-label">{cat.label}</span>
+            </button>
+          ))}
+        </div>
+      </AnimatedSection>
+
       {/* ── Entry Requirement ── */}
-      <AnimatedSection delay={0.06} className="stack-section home-ilp-section-mobile">
+      <AnimatedSection delay={0.09} className="stack-section home-ilp-section-mobile">
         <div className="ilp-glow-wrapper">
           <div className="ilp-border" />
           <div className="ilp-card-blue">
@@ -212,7 +288,24 @@ const HomePage: React.FC = () => {
 
       {/* ── Featured Destinations ── */}
       <AnimatedSection delay={0.12} className="stack-section home-featured-section">
-        <h3 className="section-title">Featured Destinations</h3>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '4px' }}>
+          <h3 className="section-title" style={{ marginBottom: 0 }}>Spots to Explore</h3>
+          <button
+            type="button"
+            onClick={() => navigate('/destinations-gallery')}
+            style={{
+              background: 'none',
+              border: 'none',
+              color: '#005baf',
+              fontWeight: 700,
+              fontSize: '13px',
+              cursor: 'pointer',
+              padding: '4px 0',
+            }}
+          >
+            See all
+          </button>
+        </div>
         <div className="featured_des_horizontal-cards">
           {isDestinationsLoading
             ? Array.from({ length: 4 }).map((_, i) => (
@@ -257,17 +350,6 @@ const HomePage: React.FC = () => {
         {!isDestinationsLoading && featuredCards.length === 0 && (
           <p className="featured_des_empty">No destinations are published yet.</p>
         )}
-
-        <div className="home-featured-actions" style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px' }}>
-          <button
-            type="button"
-            className="primary-btn"
-            onClick={() => navigate('/destinations-gallery')}
-            style={{ minWidth: '160px' }}
-          >
-            View All Destinations
-          </button>
-        </div>
       </AnimatedSection>
 
       {/* ── Essential Services ── */}
@@ -305,7 +387,7 @@ const HomePage: React.FC = () => {
               <AIIcon size={20} className="AI-Plan_input-icon" />
             </div>
           </div>
-          <button type="button" className="primary-btn">
+          <button type="button" className="primary-btn" onClick={() => navigate('/planner')}>
             <span>Generate Plan</span>
           </button>
         </div>

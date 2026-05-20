@@ -45,6 +45,7 @@ const IlpAdminDashboardPage = lazy(() => import('./pages/ilpAdmin/IlpAdminDashbo
 
 // Import service pages
 const CabsPage = lazy(() => import('./pages/services/CabsPage'));
+const TransportFeaturesPage = lazy(() => import('./pages/services/TransportFeaturesPage'));
 const CabServiceListPage = lazy(() => import('./pages/services/CabServiceListPage'));
 const RegisterVehiclePage = lazy(() => import('./pages/services/RegisterVehiclePage'));
 const HotelStaysPage = lazy(() => import('./pages/services/HotelStaysPage'));
@@ -71,8 +72,8 @@ const AppRoutes: React.FC = () => {
       <Route path="/destination/:id" element={<DestinationDetailPage />} />
       <Route path="/admin" element={<AdminPage />} />
 
-      {/* Service pages */}
       <Route path="/service/cabs" element={<CabsPage />} />
+      <Route path="/service/cabs/advanced" element={<TransportFeaturesPage />} />
       <Route path="/service/cabs/:serviceSlug" element={<CabServiceListPage />} />
       <Route path="/service/cab-rentals" element={<Navigate to="/service/cabs" replace />} />
       <Route path="/service/register-vehicle" element={<RegisterVehiclePage />} />

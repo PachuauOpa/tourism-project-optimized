@@ -110,6 +110,26 @@ const CabsPage: React.FC = () => {
         <p className="cab-location-note">
           {userLocation ? 'Showing options near your current location' : 'Enable location for nearest cab options'}
         </p>
+        
+        <button 
+          onClick={() => navigate('/service/cabs/advanced')}
+          style={{
+            marginTop: '16px',
+            background: '#005baf',
+            color: 'white',
+            border: 'none',
+            padding: '12px 24px',
+            borderRadius: '12px',
+            fontWeight: 'bold',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            margin: '16px auto 0'
+          }}
+        >
+          ✨ Advanced Transport Features
+        </button>
       </header>
 
       {menuOpen && (

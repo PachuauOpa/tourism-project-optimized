@@ -1,0 +1,416 @@
+.transport-page {
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Karla', sans-serif;
+  padding-bottom: 96px;
+}
+
+/* Header */
+.transport-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 40px 24px 20px;
+}
+
+.transport-back {
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--card);
+  color: var(--ink);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.transport-header h1 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+
+/* Tabs */
+.transport-tabs-scroll {
+  padding: 0 24px 20px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.transport-tabs-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.transport-tabs {
+  display: flex;
+  gap: 8px;
+  background: #d5e3ff;
+  padding: 6px;
+  border-radius: 999px;
+  width: max-content;
+}
+
+.transport-tab {
+  padding: 10px 20px;
+  border: none;
+  background: transparent;
+  color: #004689;
+  font-size: 14px;
+  font-weight: 700;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.transport-tab.active {
+  background: #005baf;
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(0, 91, 175, 0.2);
+}
+
+.transport-content {
+  padding: 0 24px;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* Routes Tab */
+.routes-search-box {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.routes-search-box input {
+  flex: 1;
+  padding: 14px 16px;
+  border: 1px solid #d0d9e8;
+  border-radius: 12px;
+  font-size: 14px;
+  background: var(--card);
+}
+.routes-filter-btn {
+  padding: 14px;
+  background: #005baf;
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+
+.routes-filters {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 8px;
+  margin-bottom: 24px;
+  scrollbar-width: none;
+}
+.routes-filters::-webkit-scrollbar {
+  display: none;
+}
+.route-pill {
+  white-space: nowrap;
+  padding: 8px 16px;
+  background: #eef4ff;
+  border: 1px solid #d0d9e8;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #004689;
+  cursor: pointer;
+}
+.route-pill.active {
+  background: #005baf;
+  color: #fff;
+  border-color: #005baf;
+}
+
+.route-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.route-card {
+  background: var(--card);
+  border: 1px solid #d0d9e8;
+  border-radius: 16px;
+  padding: 20px;
+}
+.route-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+.route-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 800;
+}
+.route-type {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #d5e3ff;
+  color: #004689;
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 700;
+}
+.route-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.metric {
+  display: flex;
+  flex-direction: column;
+}
+.metric-lbl {
+  font-size: 11px;
+  color: var(--muted);
+  text-transform: uppercase;
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+.metric-val {
+  font-size: 15px;
+  font-weight: 800;
+  color: #005baf;
+}
+
+.route-slots {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+.slot-pill {
+  font-size: 12px;
+  font-weight: 700;
+  padding: 6px 12px;
+  border-radius: 8px;
+}
+.slot-available {
+  background: #eafaf1;
+  color: #0f6f41;
+  border: 1px solid #bde7ce;
+}
+.slot-full {
+  background: #ffe9eb;
+  color: #ad2b35;
+  border: 1px solid #f3c4cb;
+}
+
+.route-alert {
+  background: #f8fbff;
+  border: 1px solid #d5e3ff;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  color: #004689;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+.route-actions {
+  display: flex;
+  gap: 12px;
+}
+.route-btn-call {
+  flex: 1;
+  padding: 12px;
+  background: #ffffff;
+  border: 2px solid #005baf;
+  color: #005baf;
+  border-radius: 10px;
+  font-weight: 800;
+  cursor: pointer;
+}
+.route-btn-book {
+  flex: 2;
+  padding: 12px;
+  background: #005baf;
+  border: none;
+  color: #ffffff;
+  border-radius: 10px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+/* Fares Tab */
+.fare-calculator {
+  background: var(--card);
+  border: 1px solid #d0d9e8;
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 24px;
+}
+.fare-calculator h3, .fare-guidelines h3, .rental-rates-card h3, .rental-operators h3 {
+  margin: 0 0 16px;
+  font-size: 18px;
+  font-weight: 800;
+  color: #004689;
+}
+.fare-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.fare-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.fare-field label {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink);
+}
+.fare-field input, .fare-field select {
+  padding: 12px;
+  border: 1px solid #d0d9e8;
+  border-radius: 10px;
+  font-size: 14px;
+  background: #ffffff;
+}
+.fare-field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.fare-calc-btn {
+  padding: 14px;
+  background: #005baf;
+  color: #ffffff;
+  border: none;
+  border-radius: 10px;
+  font-weight: 800;
+  cursor: pointer;
+  margin-top: 8px;
+}
+.fare-result {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px dashed #d0d9e8;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.fare-result-lbl {
+  font-size: 14px;
+  font-weight: 700;
+}
+.fare-result-val {
+  font-size: 24px;
+  font-weight: 900;
+  color: #005baf;
+}
+
+.fare-guidelines {
+  background: #f8fbff;
+  border: 1px solid #d5e3ff;
+  border-radius: 16px;
+  padding: 24px;
+}
+.tariff-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.tariff-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px;
+  background: #ffffff;
+  border-radius: 8px;
+  border: 1px solid #e0ecfc;
+}
+.tariff-item strong {
+  font-size: 14px;
+  color: var(--ink);
+}
+.tariff-item span {
+  font-size: 14px;
+  font-weight: 700;
+  color: #004689;
+}
+
+/* Rentals Tab */
+.rental-rates-card {
+  background: var(--card);
+  border: 1px solid #d0d9e8;
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 24px;
+}
+.rental-rate-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.rental-rate-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  background: #ffffff;
+  border-radius: 8px;
+  border: 1px solid #e0ecfc;
+}
+.rate-item-left strong {
+  font-size: 14px;
+}
+.rate-item-right {
+  display: flex;
+  gap: 12px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #005baf;
+}
+.rental-note {
+  margin: 16px 0 0;
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.operator-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--card);
+  border: 1px solid #d0d9e8;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 12px;
+}
+.operator-info h4 {
+  margin: 0 0 4px;
+  font-size: 15px;
+  font-weight: 800;
+}
+.operator-info p {
+  margin: 0;
+  font-size: 13px;
+  color: var(--muted);
+  font-weight: 600;
+}
+.operator-call-btn {
+  padding: 8px 16px;
+  background: #005baf;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  font-weight: 800;
+  font-size: 12px;
+  cursor: pointer;
+}
