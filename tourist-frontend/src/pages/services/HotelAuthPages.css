@@ -1,0 +1,280 @@
+/* ============================================================
+   HotelAuthPages.css — Register & Login shared styles
+   Blue palette: #ECEFF7 bg, #3095EC accent, #d9e3f1 borders
+   ============================================================ */
+
+.hotel-auth-page {
+  --ha-bg: #ECEFF7;
+  --ha-card: linear-gradient(165deg, #eef3fb 0%, #e6edf8 100%);
+  --ha-blue: #3095EC;
+  --ha-blue-dark: #2056a0;
+  --ha-blue-soft: #dfeefe;
+  --ha-ink: #1E1E1E;
+  --ha-muted: #606977;
+  --ha-border: #cad2e0;
+  --ha-border-mid: #d9e3f1;
+  --ha-white: #ffffff;
+  --ha-rose: #ef4a42;
+  --ha-shadow: 0 16px 36px rgba(35, 61, 107, 0.12);
+  --ha-radius: 20px;
+  --ha-transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  background: var(--ha-bg);
+  min-height: 100dvh;
+  padding-bottom: 80px;
+  font-family: 'Karla', sans-serif;
+}
+
+/* ── Auth Header ── */
+.ha-header {
+  background: linear-gradient(135deg, #1a3a6a 0%, #2056a0 60%, #3095EC 100%);
+  padding: 48px 24px 56px;
+  position: relative;
+  overflow: hidden;
+}
+
+.ha-header::before {
+  content: '';
+  position: absolute; top: -40px; right: -40px;
+  width: 200px; height: 200px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.ha-header::after {
+  content: '';
+  position: absolute; bottom: -30px; left: 20%;
+  width: 140px; height: 140px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,255,255,0.07) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.ha-header-top {
+  display: flex; align-items: center;
+  justify-content: space-between;
+  margin-bottom: 28px;
+  position: relative; z-index: 1;
+}
+
+.ha-back-btn {
+  width: 40px; height: 40px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.25);
+  background: rgba(255,255,255,0.12);
+  color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; backdrop-filter: blur(8px);
+  transition: background var(--ha-transition);
+  text-decoration: none; flex-shrink: 0;
+}
+.ha-back-btn:hover { background: rgba(255,255,255,0.22); }
+
+.ha-header-icon {
+  font-size: 44px; display: block;
+  margin-bottom: 14px; position: relative; z-index: 1;
+}
+
+.ha-header-title {
+  font-size: clamp(22px, 5vw, 28px); font-weight: 800;
+  color: #fff; margin: 0 0 6px;
+  position: relative; z-index: 1; letter-spacing: -0.5px;
+}
+
+.ha-header-subtitle {
+  font-size: 13px; color: rgba(255,255,255,0.65);
+  margin: 0; position: relative; z-index: 1;
+}
+
+/* ── Step Indicator ── */
+.ha-steps {
+  display: flex; align-items: center;
+  justify-content: center; gap: 0;
+  padding: 0 24px;
+  margin: -20px 0 0;
+  position: relative; z-index: 5;
+  background: var(--ha-bg);
+}
+
+.ha-step {
+  display: flex; align-items: center; flex: 1;
+}
+
+.ha-step-circle {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: var(--ha-white);
+  border: 2px solid var(--ha-border-mid);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 800;
+  color: var(--ha-muted); flex-shrink: 0;
+  transition: all var(--ha-transition);
+  box-shadow: 0 2px 8px rgba(35,61,107,0.1);
+  position: relative; z-index: 1;
+}
+.ha-step.active .ha-step-circle,
+.ha-step.done .ha-step-circle {
+  background: linear-gradient(135deg, #2e7ff0, #3095EC);
+  border-color: transparent; color: #fff;
+}
+
+.ha-step-line {
+  flex: 1; height: 2px; background: var(--ha-border-mid);
+  transition: background var(--ha-transition);
+}
+.ha-step.done .ha-step-line { background: var(--ha-blue); }
+
+/* ── Form Card ── */
+.ha-form-card {
+  background: var(--ha-card);
+  border: 1px solid var(--ha-border-mid);
+  border-radius: var(--ha-radius);
+  margin: 28px 20px 0;
+  padding: 22px;
+  box-shadow: var(--ha-shadow);
+}
+
+.ha-form-card-title {
+  font-size: 16px; font-weight: 800;
+  color: var(--ha-ink); margin: 0 0 18px;
+  display: flex; align-items: center; gap: 8px;
+  letter-spacing: -0.3px;
+}
+
+/* ── Form Fields ── */
+.ha-field { margin-bottom: 16px; }
+
+.ha-label {
+  display: block; font-size: 11px; font-weight: 800;
+  color: #2e466b; letter-spacing: 0.5px;
+  text-transform: uppercase; margin-bottom: 7px;
+}
+
+.ha-input, .ha-select, .ha-textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--ha-border-mid);
+  border-radius: 12px;
+  font-size: 14px; font-weight: 500;
+  color: var(--ha-ink);
+  background: #f6f9ff;
+  outline: none;
+  transition: border-color var(--ha-transition), box-shadow var(--ha-transition);
+  box-sizing: border-box;
+  font-family: inherit;
+}
+.ha-input:focus, .ha-select:focus, .ha-textarea:focus {
+  border-color: var(--ha-blue);
+  box-shadow: 0 0 0 3px rgba(48, 149, 236, 0.15);
+  background: var(--ha-white);
+}
+.ha-textarea { resize: vertical; min-height: 90px; }
+
+.ha-input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.ha-input-error { color: var(--ha-rose); font-size: 12px; margin: 5px 0 0; }
+
+/* ── Amenities Checkbox Grid ── */
+.ha-amenity-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+
+.ha-amenity-check {
+  display: flex; align-items: center; gap: 10px;
+  padding: 11px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--ha-border-mid);
+  background: #f6f9ff;
+  cursor: pointer;
+  transition: all var(--ha-transition);
+  user-select: none;
+}
+.ha-amenity-check.checked {
+  border-color: var(--ha-blue);
+  background: var(--ha-blue-soft);
+}
+.ha-amenity-check input[type="checkbox"] { display: none; }
+.ha-amenity-check-icon { font-size: 20px; }
+.ha-amenity-check-label { font-size: 13px; font-weight: 700; color: var(--ha-ink); }
+
+/* ── Submit / Nav Buttons ── */
+.ha-actions { display: flex; gap: 12px; margin: 20px 20px 0; }
+
+.ha-btn-primary {
+  flex: 1;
+  background: linear-gradient(135deg, #2e7ff0, #3095EC);
+  color: #fff;
+  border: none; border-radius: 14px;
+  padding: 14px 24px;
+  font-size: 15px; font-weight: 800;
+  cursor: pointer; font-family: inherit;
+  transition: opacity var(--ha-transition), transform var(--ha-transition);
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.ha-btn-primary:hover:not(:disabled) { opacity: 0.9; transform: translateY(-1px); }
+.ha-btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.ha-btn-secondary {
+  width: 50px; height: 50px;
+  border-radius: 12px;
+  border: 1px solid var(--ha-border-mid);
+  background: var(--ha-white);
+  color: var(--ha-ink); font-size: 20px;
+  cursor: pointer; font-family: inherit;
+  display: flex; align-items: center; justify-content: center;
+  transition: background var(--ha-transition);
+  flex-shrink: 0; align-self: center;
+}
+.ha-btn-secondary:hover { background: var(--ha-blue-soft); }
+
+/* ── Success State ── */
+.ha-success-card {
+  background: var(--ha-card);
+  border: 1px solid var(--ha-border-mid);
+  border-radius: var(--ha-radius);
+  margin: 40px 20px;
+  padding: 40px 24px;
+  text-align: center;
+  box-shadow: var(--ha-shadow);
+}
+.ha-success-icon { font-size: 60px; margin-bottom: 16px; }
+.ha-success-title { font-size: 22px; font-weight: 800; color: var(--ha-ink); margin: 0 0 8px; letter-spacing: -0.5px; }
+.ha-success-sub { font-size: 14px; color: var(--ha-muted); margin: 0 0 28px; line-height: 1.6; }
+
+/* ── Error Alert ── */
+.ha-error-alert {
+  background: #fff0f2;
+  border: 1px solid #f3c4cb;
+  border-radius: 12px;
+  padding: 12px 16px;
+  font-size: 13px; font-weight: 700;
+  color: #b73b4d;
+  margin-bottom: 16px;
+  display: flex; align-items: center; gap: 8px;
+}
+
+/* ── Auth Footer ── */
+.ha-footer {
+  text-align: center;
+  padding: 20px;
+  font-size: 13px;
+  color: var(--ha-muted);
+}
+.ha-footer a { color: var(--ha-blue); font-weight: 700; text-decoration: none; }
+.ha-footer a:hover { text-decoration: underline; }
+
+/* ── Login Card ── */
+.ha-login-card {
+  background: var(--ha-card);
+  border: 1px solid var(--ha-border-mid);
+  border-radius: var(--ha-radius);
+  margin: 28px 20px 0;
+  padding: 24px;
+  box-shadow: var(--ha-shadow);
+}
+
+.ha-divider { height: 1px; background: var(--ha-border-mid); margin: 20px 0; }
+
+.ha-password-wrap { position: relative; }
+
+.ha-password-toggle {
+  position: absolute; right: 14px; top: 50%;
+  transform: translateY(-50%);
+  background: none; border: none;
+  cursor: pointer; font-size: 18px;
+  color: var(--ha-muted); padding: 4px;
+}

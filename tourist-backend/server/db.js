@@ -743,4 +743,149 @@ export const initializeDatabase = async () => {
   await pool.query('CREATE INDEX IF NOT EXISTS idx_passenger_vehicles_geom ON passenger_vehicles USING GIST(geom)');
 
   console.log('Vehicle tables initialized successfully');
+
+  // ---------------------------------------------------------------------------
+  // Hotels & Homestays tables
+  // ---------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
+  // Hotels & Homestays tables
+  // ---------------------------------------------------------------------------
+  console.log('Creating hotel tables...');
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS hotel_owner_accounts (
+      id BIGSERIAL PRIMARY KEY,
+      full_name TEXT NOT NULL,
+      email TEXT NOT NULL UNIQUE,
+      phone TEXT NOT NULL,
+      password_hash TEXT NOT NULL,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    )
+  `);
+
+  await pool.query('ALTER TABLE hotel_owner_accounts ADD COLUMN IF NOT EXISTS full_name TEXT');
+  await pool.query('ALTER TABLE hotel_owner_accounts ADD COLUMN IF NOT EXISTS phone TEXT');
+  await pool.query('ALTER TABLE hotel_owner_accounts ADD COLUMN IF NOT EXISTS password_hash TEXT');
+  await pool.query('CREATE UNIQUE INDEX IF NOT EXISTS hotel_owner_accounts_email_key ON hotel_owner_accounts(LOWER(email))');
+
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS hotel_listings (
+      id BIGSERIAL PRIMARY KEY,
+      owner_id BIGINT NOT NULL REFERENCES hotel_owner_accounts(id) ON DELETE CASCADE,
+      property_name TEXT NOT NULL,
+      property_type TEXT NOT NULL DEFAULT 'hotel',
+      tagline TEXT,
+      description TEXT,
+      district TEXT,
+      full_address TEXT,
+      latitude DOUBLE PRECISION,
+      longitude DOUBLE PRECISION,
+      geom GEOGRAPHY(Point, 4326),
+      price_per_night INTEGER,
+      contact_phone TEXT,
+      contact_email TEXT,
+      website_url TEXT,
+      amenities TEXT[] NOT NULL DEFAULT '{}',
+      cover_photo_url TEXT,
+      photos JSONB NOT NULL DEFAULT '[]',
+      rating NUMERIC(3,1) NOT NULL DEFAULT 0,
+      review_count INTEGER NOT NULL DEFAULT 0,
+      is_published BOOLEAN NOT NULL DEFAULT true,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    )
+  `);
+
+  await pool.query('ALTER TABLE hotel_listings ADD COLUMN IF NOT EXISTS tagline TEXT');
+  await pool.query('ALTER TABLE hotel_listings ADD COLUMN IF NOT EXISTS website_url TEXT');
+  await pool.query('ALTER TABLE hotel_listings ADD COLUMN IF NOT EXISTS cover_photo_url TEXT');
+  await pool.query("ALTER TABLE hotel_listings ADD COLUMN IF NOT EXISTS photos JSONB NOT NULL DEFAULT '[]'");
+  await pool.query('ALTER TABLE hotel_listings ADD COLUMN IF NOT EXISTS review_count INTEGER NOT NULL DEFAULT 0');
+  await pool.query('CREATE INDEX IF NOT EXISTS idx_hotel_listings_owner_id ON hotel_listings(owner_id)');
+  await pool.query('CREATE INDEX IF NOT EXISTS idx_hotel_listings_published ON hotel_listings(is_published)');
+  await pool.query('CREATE INDEX IF NOT EXISTS idx_hotel_listings_type ON hotel_listings(property_type)');
+
+  await pool.query(`
+    CREATE OR REPLACE FUNCTION sync_hotel_geom()
+    RETURNS TRIGGER AS $$
+    BEGIN
+      IF NEW.longitude IS NOT NULL AND NEW.latitude IS NOT NULL THEN
+        NEW.geom = ST_SetSRID(ST_MakePoint(NEW.longitude, NEW.latitude), 4326)::geography;
+      ELSE
+        NEW.geom = NULL;
+      END IF;
+      RETURN NEW;
+    END;
+    $$ LANGUAGE plpgsql;
+  `);
+
+  await pool.query('DROP TRIGGER IF EXISTS trg_hotel_listings_sync_geom ON hotel_listings');
+  await pool.query(`
+    CREATE TRIGGER trg_hotel_listings_sync_geom
+    BEFORE INSERT OR UPDATE ON hotel_listings
+    FOR EACH ROW
+    EXECUTE FUNCTION sync_hotel_geom()
+  `);
+
+  await pool.query(`
+    CREATE OR REPLACE FUNCTION set_hotel_listing_updated_at()
+    RETURNS TRIGGER AS $$
+    BEGIN
+      NEW.updated_at = NOW();
+      RETURN NEW;
+    END;
+    $$ LANGUAGE plpgsql;
+  `);
+
+  await pool.query('DROP TRIGGER IF EXISTS trg_hotel_listings_updated_at ON hotel_listings');
+  await pool.query(`
+    CREATE TRIGGER trg_hotel_listings_updated_at
+    BEFORE UPDATE ON hotel_listings
+    FOR EACH ROW
+    EXECUTE FUNCTION set_hotel_listing_updated_at()
+  `);
+
+  console.log('Hotel tables initialized successfully');
+
+  // Dev seed: insert mock data only if table is empty
+  try {
+    const { rowCount } = await pool.query('SELECT 1 FROM hotel_owner_accounts LIMIT 1');
+    if (rowCount === 0) {
+      const crypto = await import('crypto');
+      const hashPw = (plain) => {
+        const salt = crypto.randomBytes(16).toString('hex');
+        const hash = crypto.scryptSync(plain, salt, 64).toString('hex');
+        return `${salt}:${hash}`;
+      };
+      const PASS = 'password123';
+      const o1 = await pool.query(
+        `INSERT INTO hotel_owner_accounts (full_name, email, phone, password_hash) VALUES ($1,$2,$3,$4) RETURNING id`,
+        ['Lalrindika Sailo', 'owner1@hotel.test', '+91 98620 11001', hashPw(PASS)]
+      );
+      const o2 = await pool.query(
+        `INSERT INTO hotel_owner_accounts (full_name, email, phone, password_hash) VALUES ($1,$2,$3,$4) RETURNING id`,
+        ['Zothansangi Hmar', 'owner2@hotel.test', '+91 98620 22002', hashPw(PASS)]
+      );
+      const o3 = await pool.query(
+        `INSERT INTO hotel_owner_accounts (full_name, email, phone, password_hash) VALUES ($1,$2,$3,$4) RETURNING id`,
+        ['Vanlalruata Ralte', 'owner3@hotel.test', '+91 98620 33003', hashPw(PASS)]
+      );
+      const id1 = o1.rows[0].id; const id2 = o2.rows[0].id; const id3 = o3.rows[0].id;
+      const p1 = JSON.stringify([{id:'a',url:'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&q=80',caption:'Exterior'},{id:'b',url:'https://images.unsplash.com/photo-1590490360182-c33d57733427?w=800&q=80',caption:'Room'},{id:'c',url:'https://images.unsplash.com/photo-1571003123894-1f0594d2b5d9?w=800&q=80',caption:'Restaurant'}]);
+      const p2 = JSON.stringify([{id:'a',url:'https://images.unsplash.com/photo-1510798831971-661eb04b3739?w=800&q=80',caption:'Front'},{id:'b',url:'https://images.unsplash.com/photo-1445019980597-93fa8acb246c?w=800&q=80',caption:'Room'},{id:'c',url:'https://images.unsplash.com/photo-1416339306562-f3d12fefd36f?w=800&q=80',caption:'Garden'}]);
+      const p3 = JSON.stringify([{id:'a',url:'https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=800&q=80',caption:'Resort'},{id:'b',url:'https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=800&q=80',caption:'Pool'},{id:'c',url:'https://images.unsplash.com/photo-1555854877-bab0e564b8d5?w=800&q=80',caption:'Suite'},{id:'d',url:'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800&q=80',caption:'Dining'}]);
+      const p4 = JSON.stringify([{id:'a',url:'https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=800&q=80',caption:'Guesthouse'},{id:'b',url:'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=800&q=80',caption:'Room'}]);
+      await pool.query(`INSERT INTO hotel_listings (owner_id,property_name,property_type,tagline,description,district,full_address,latitude,longitude,price_per_night,contact_phone,contact_email,amenities,cover_photo_url,photos,rating,review_count,is_published) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18)`,
+        [id1,'Blue Hill Hotel','hotel','Comfort in the heart of Aizawl',"Modern hotel with panoramic Aizawl skyline views. Well-appointed rooms near Solomon's Temple.",'Aizawl','Zarkawt, Aizawl, Mizoram 796001',23.7271,92.7176,1800,'+91 98620 11001','info@bluehillhotel.test','{wifi,parking,food,ac,tv,laundry}','https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&q=80',p1,4.3,28,true]);
+      await pool.query(`INSERT INTO hotel_listings (owner_id,property_name,property_type,tagline,description,district,full_address,latitude,longitude,price_per_night,contact_phone,contact_email,amenities,cover_photo_url,photos,rating,review_count,is_published) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18)`,
+        [id2,'Mizo Meadows Homestay','homestay','Experience authentic Mizo hospitality','Nestled in the serene hills of Champhai. Home-cooked traditional meals, mountain views, authentic Mizo culture.','Champhai','Near Champhai Market, Champhai, Mizoram 796321',23.4567,93.3245,950,'+91 98620 22002','meadows@homestay.test','{wifi,food,parking,garden,heater}','https://images.unsplash.com/photo-1510798831971-661eb04b3739?w=800&q=80',p2,4.7,42,true]);
+      await pool.query(`INSERT INTO hotel_listings (owner_id,property_name,property_type,tagline,description,district,full_address,latitude,longitude,price_per_night,contact_phone,contact_email,website_url,amenities,cover_photo_url,photos,rating,review_count,is_published) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19)`,
+        [id3,'Lunglei Valley Resort','resort','Luxury amidst the southern highlands','Premium retreat with infinity pool, full-service spa, and fine dining in southern Mizoram.','Lunglei','Lunglei Hill Top, Lunglei, Mizoram 796701',22.8920,92.7340,4500,'+91 98620 33003','stay@lungleiresort.test','https://lungleiresort.test','{wifi,pool,spa,food,gym,parking,bar,ac,laundry,tv}','https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?w=800&q=80',p3,4.8,15,true]);
+      await pool.query(`INSERT INTO hotel_listings (owner_id,property_name,property_type,tagline,description,district,full_address,latitude,longitude,price_per_night,contact_phone,contact_email,amenities,cover_photo_url,photos,rating,review_count,is_published) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18)`,
+        [id1,'Kolasib River Guesthouse','guesthouse','Riverside peace and quiet','Cozy guesthouse on the banks of the Tlawng River with river-facing balconies. Ideal for backpackers.','Kolasib','River Road, Kolasib Town, Mizoram 796081',24.2241,92.6767,650,'+91 98620 11001','river@guesthouse.test','{wifi,parking,food,tv}','https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=800&q=80',p4,4.1,19,true]);
+      console.log('Hotel mock data seeded: 4 listings, 3 owners. Login: owner1@hotel.test / password123');
+    }
+  } catch (seedErr) {
+    console.warn('Hotel seed skipped (non-fatal):', seedErr.message);
+  }
 };

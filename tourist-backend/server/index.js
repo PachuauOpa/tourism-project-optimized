@@ -9,6 +9,7 @@ import { createClient } from '@supabase/supabase-js';
 import { initializeDatabase, pool } from './db.js';
 import { registerDestinationRoutes } from './destinationRoutes.js';
 import vehicleRoutes from './vehicleRoutes.js';
+import hotelRoutes from './hotelRoutes.js';
 import {
   buildStorageAssetUrl,
   buildVariantStoragePaths,
@@ -1757,6 +1758,7 @@ registerDestinationRoutes(app, {
 });
 
 app.use('/api/vehicles', vehicleRoutes);
+app.use('/api/hotels', hotelRoutes);
 
 const startServer = () => {
   app.listen(port, () => {

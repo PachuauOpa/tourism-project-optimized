@@ -49,6 +49,10 @@ const TransportFeaturesPage = lazy(() => import('./pages/services/TransportFeatu
 const CabServiceListPage = lazy(() => import('./pages/services/CabServiceListPage'));
 const RegisterVehiclePage = lazy(() => import('./pages/services/RegisterVehiclePage'));
 const HotelStaysPage = lazy(() => import('./pages/services/HotelStaysPage'));
+const HotelDetailPage = lazy(() => import('./pages/services/HotelDetailPage'));
+const HotelRegisterPage = lazy(() => import('./pages/services/HotelRegisterPage'));
+const HotelLoginPage = lazy(() => import('./pages/services/HotelLoginPage'));
+const HotelDashboardPage = lazy(() => import('./pages/services/HotelDashboardPage'));
 const ExperiencesPage = lazy(() => import('./pages/services/ExperiencesPage'));
 
 const AppRoutes: React.FC = () => {
@@ -78,6 +82,10 @@ const AppRoutes: React.FC = () => {
       <Route path="/service/cab-rentals" element={<Navigate to="/service/cabs" replace />} />
       <Route path="/service/register-vehicle" element={<RegisterVehiclePage />} />
       <Route path="/service/hotel-stays" element={<HotelStaysPage />} />
+      <Route path="/service/hotel-stays/:id" element={<HotelDetailPage />} />
+      <Route path="/service/hotels/register" element={<HotelRegisterPage />} />
+      <Route path="/service/hotels/login" element={<HotelLoginPage />} />
+      <Route path="/service/hotels/dashboard" element={<HotelDashboardPage />} />
       <Route path="/service/experiences" element={<ExperiencesPage />} />
 
       {/* ILP pages */}
